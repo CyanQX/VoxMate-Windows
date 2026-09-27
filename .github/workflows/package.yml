@@ -40,8 +40,8 @@ jobs:
           Invoke-WebRequest -Uri $url -OutFile $download
           $actual = (Get-FileHash -Algorithm SHA256 -LiteralPath $download).Hash.ToLowerInvariant()
           if ($actual -ne $expected) { throw 'Inno Setup download hash mismatch.' }
-          & $download '/PORTABLE=1' '/VERYSILENT' '/SP-' '/SUPPRESSMSGBOXES' '/NORESTART' '/CURRENTUSER' "/DIR=$destination"
-          if ($LASTEXITCODE -ne 0) { throw "Inno Setup extraction failed: $LASTEXITCODE" }
+          $installer = Start-Process -FilePath $download -ArgumentList @('/PORTABLE=1', '/VERYSILENT', '/SP-', '/SUPPRESSMSGBOXES', '/NORESTART', '/CURRENTUSER', "/DIR=$destination") -Wait -PassThru -WindowStyle Hidden
+          if ($installer.ExitCode -ne 0) { throw "Inno Setup extraction failed: $($installer.ExitCode)" }
           if (-not (Test-Path -LiteralPath (Join-Path $destination 'ISCC.exe'))) { throw 'ISCC.exe missing.' }
       - name: Acquire verified local runtimes and models
         shell: pwsh
