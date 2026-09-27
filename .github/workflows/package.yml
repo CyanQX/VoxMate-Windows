@@ -51,6 +51,25 @@ jobs:
       - name: Build and package
         shell: pwsh
         run: ./build-installer.ps1
+      - name: Verify installer metadata and checksum
+        shell: pwsh
+        run: |
+          $version = '${{ steps.app-version.outputs.version }}'
+          $filename = "VoxMate-Setup-$version-win-x64.exe"
+          $installerPath = Join-Path 'artifacts/installer' $filename
+          $checksumPath = Join-Path 'artifacts/installer' "VoxMate-Setup-$version-win-x64.sha256"
+          $installer = Get-Item -LiteralPath $installerPath -ErrorAction Stop
+          if ($installer.VersionInfo.ProductName.Trim() -ne 'VoxMate' -or
+              $installer.VersionInfo.ProductVersion.Trim() -ne $version -or
+              $installer.VersionInfo.FileVersion.Trim() -ne $version -or
+              $installer.VersionInfo.CompanyName.Trim() -ne 'VoxMate') {
+            throw 'Installer version metadata does not match the SignPath artifact configuration.'
+          }
+          $signature = Get-AuthenticodeSignature -LiteralPath $installerPath
+          if ($signature.Status -ne 'NotSigned') { throw "Expected an unsigned build; found $($signature.Status)." }
+          $checksum = (Get-Content -LiteralPath $checksumPath -Raw).Trim()
+          $hash = (Get-FileHash -LiteralPath $installerPath -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($checksum -ne "$hash  $filename") { throw 'Installer SHA-256 file does not match.' }
       - name: Upload unsigned installer for origin verification
         id: unsigned-installer
         uses: actions/upload-artifact@v7
@@ -101,7 +120,7 @@ jobs:
           if ($signature.Status -ne 'Valid' -or $signature.SignerCertificate.Subject -notmatch 'SignPath Foundation') {
             throw "Unexpected signature status or publisher: $($signature.Status) / $($signature.SignerCertificate.Subject)"
           }
-          if ($signed[0].VersionInfo.ProductName -ne 'VoxMate' -or $signed[0].VersionInfo.ProductVersion -ne '${{ steps.app-version.outputs.version }}') {
+          if ($signed[0].VersionInfo.ProductName.Trim() -ne 'VoxMate' -or $signed[0].VersionInfo.ProductVersion.Trim() -ne '${{ steps.app-version.outputs.version }}') {
             throw 'Signed installer version metadata does not match this build.'
           }
           $hash = (Get-FileHash -LiteralPath $signed[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant()
