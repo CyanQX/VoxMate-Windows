@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\VoiceTranslator.Core\VoiceTranslator.Core.csproj" />
+    <ProjectReference Include="..\VoiceTranslator.Audio\VoiceTranslator.Audio.csproj" />
+    <ProjectReference Include="..\VoiceTranslator.Whisper\VoiceTranslator.Whisper.csproj" />
+    <ProjectReference Include="..\VoiceTranslator.Infrastructure\VoiceTranslator.Infrastructure.csproj" />
+    <ProjectReference Include="..\VoiceTranslator.Translation\VoiceTranslator.Translation.csproj" />
+    <ProjectReference Include="..\VoiceTranslator.Platform\VoiceTranslator.Platform.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\*.png" />
+    <Resource Include="Assets\*.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationIcon>Assets\voxmate.ico</ApplicationIcon>
+    <Version>0.1.0</Version>
+    <Product>VoxMate</Product>
+  </PropertyGroup>
+
+</Project>

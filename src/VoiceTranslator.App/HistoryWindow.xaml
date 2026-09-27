@@ -1,0 +1,45 @@
+<Window x:Class="VoiceTranslator.App.HistoryWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="历史记录 · VoxMate" Icon="Assets/voxmate.ico" Width="610" Height="490" MinWidth="500" MinHeight="380"
+        WindowStartupLocation="CenterOwner" Background="#F8FAFF" FontFamily="Microsoft YaHei UI" Foreground="#101936">
+    <Grid Margin="16" Background="#F8FAFF">
+        <Grid.RowDefinitions><RowDefinition Height="38"/><RowDefinition Height="42"/><RowDefinition Height="28"/><RowDefinition Height="*"/><RowDefinition Height="38"/></Grid.RowDefinitions>
+        <TextBlock Text="历史记录" FontSize="18" FontWeight="Bold"/>
+        <Grid Grid.Row="1"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="150"/></Grid.ColumnDefinitions>
+            <TextBox x:Name="SearchBox" Height="31" Padding="9,4" VerticalContentAlignment="Center" TextChanged="FilterChanged" ToolTip="搜索原文或译文"/>
+            <TextBlock IsHitTestVisible="False" Text="⌕  搜索历史记录..." Foreground="#9AA4B5" FontSize="11" VerticalAlignment="Center" Margin="10,0,0,0">
+                <TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding Text, ElementName=SearchBox}" Value=""><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></TextBlock.Style>
+            </TextBlock>
+            <ComboBox x:Name="ModeFilter" Grid.Column="1" Margin="8,0,0,0" Height="31" SelectedIndex="0" SelectionChanged="FilterChanged">
+                <ComboBoxItem Content="全部模式" Tag="All"/><ComboBoxItem Content="直接翻译" Tag="Direct"/><ComboBoxItem Content="AI Prompt" Tag="AiPrompt"/><ComboBoxItem Content="技术开发" Tag="Technical"/><ComboBoxItem Content="学术翻译" Tag="Academic"/><ComboBoxItem Content="商务翻译" Tag="Business"/>
+            </ComboBox>
+        </Grid>
+        <TextBlock x:Name="NoticeText" Grid.Row="2" Foreground="#7B849A" FontSize="11" VerticalAlignment="Center"/>
+        <Border Grid.Row="3" BorderBrush="#DEE3EF" BorderThickness="1" CornerRadius="9" Background="White">
+            <ListBox x:Name="EntriesList" BorderThickness="0" Background="Transparent" Margin="4">
+                <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem"><Setter Property="HorizontalContentAlignment" Value="Stretch"/></Style></ListBox.ItemContainerStyle>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="#E7EAF2" BorderThickness="0,0,0,1" Padding="8,7" HorizontalAlignment="Stretch">
+                            <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="66"/><ColumnDefinition Width="38"/><ColumnDefinition Width="38"/></Grid.ColumnDefinitions>
+                                <Grid Grid.Column="0"><Grid.RowDefinitions><RowDefinition Height="18"/><RowDefinition Height="17"/><RowDefinition Height="16"/></Grid.RowDefinitions>
+                                    <TextBlock Text="{Binding SourceText}" TextTrimming="CharacterEllipsis" FontSize="12" FontWeight="SemiBold"/>
+                                    <TextBlock Grid.Row="1" Text="{Binding TranslationText}" TextTrimming="CharacterEllipsis" Foreground="#66718D" FontSize="11"/>
+                                    <StackPanel Grid.Row="2" Orientation="Horizontal">
+                                        <TextBlock Text="{Binding LanguagePairLabel}" Foreground="#584BFF" FontSize="10" Margin="0,0,10,0"/>
+                                        <TextBlock Text="{Binding ModeLabel}" Foreground="#584BFF" FontSize="10"/>
+                                    </StackPanel>
+                                </Grid>
+                                <TextBlock Grid.Column="1" Text="{Binding CreatedAt, StringFormat={}{0:MM/dd HH:mm}}" FontSize="10" Foreground="#8A94A9" VerticalAlignment="Center"/>
+                                <Button Grid.Column="2" Style="{StaticResource FlatButton}" Padding="0" Content="⧉" ToolTip="复制译文" Tag="{Binding}" Click="Copy_Click" Margin="3"/>
+                                <Button Grid.Column="3" Style="{StaticResource FlatButton}" Padding="0" Content="×" ToolTip="删除记录" Tag="{Binding}" Click="Delete_Click" Margin="3"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Border>
+        <Button Grid.Row="4" Style="{StaticResource FlatButton}" Content="清空历史记录" HorizontalAlignment="Right" Margin="0,7,0,0" Click="Clear_Click"/>
+    </Grid>
+</Window>

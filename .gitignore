@@ -1,0 +1,11 @@
+**/bin/
+**/obj/
+.local/
+artifacts/
+*.user
+*.pfx
+*.p12
+*.pem
+*.key
+.env
+.env.*

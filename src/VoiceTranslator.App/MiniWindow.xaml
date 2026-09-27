@@ -1,0 +1,111 @@
+<Window x:Class="VoiceTranslator.App.MiniWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:core="clr-namespace:VoiceTranslator.Core;assembly=VoiceTranslator.Core"
+        Title="VoxMate · 迷你模式" Icon="Assets/voxmate.ico" Width="385" Height="320" ResizeMode="NoResize"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent" Topmost="True"
+        WindowStartupLocation="CenterScreen" FontFamily="Microsoft YaHei UI" Foreground="#101936">
+    <Window.Resources>
+        <Style x:Key="StatusWaveBar" TargetType="Border">
+            <Setter Property="Background" Value="#7B75FF"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding State}" Value="{x:Static core:AssistantState.Recording}"><Setter Property="Background" Value="#F04450"/></DataTrigger>
+                <DataTrigger Binding="{Binding State}" Value="{x:Static core:AssistantState.Recognizing}"><Setter Property="Background" Value="#5162F9"/></DataTrigger>
+                                <DataTrigger Binding="{Binding State}" Value="{x:Static core:AssistantState.SourceReady}"><Setter Property="Background" Value="#0CAF67"/></DataTrigger>
+                                <DataTrigger Binding="{Binding State}" Value="{x:Static core:AssistantState.Completed}"><Setter Property="Background" Value="#0CAF67"/></DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    <Border x:Name="MiniShell" Margin="10" Background="#F7F8FF" CornerRadius="14" BorderBrush="#BBC5E8" BorderThickness="1">
+        <Border.Effect><DropShadowEffect Color="#263660" BlurRadius="18" ShadowDepth="4" Opacity="0.22"/></Border.Effect>
+        <Grid Margin="9">
+            <Grid.RowDefinitions><RowDefinition Height="49"/><RowDefinition Height="61"/><RowDefinition Height="82"/><RowDefinition Height="82"/></Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="44"/><ColumnDefinition Width="*"/><ColumnDefinition Width="30"/><ColumnDefinition Width="30"/><ColumnDefinition Width="30"/></Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Command="{Binding ToggleRecordingCommand}" Width="38" Height="38" BorderThickness="0" Background="#584BFF" Foreground="White" Cursor="Hand" ToolTip="开始或停止录音">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button"><Border Background="{TemplateBinding Background}" CornerRadius="10"><ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/></Border></ControlTemplate>
+                    </Button.Template>
+                    <TextBlock Style="{StaticResource IconText}" Text="&#xE720;" Foreground="White" FontSize="21"/>
+                </Button>
+                <Border Grid.Column="1" Background="White" BorderBrush="#DEE3F0" BorderThickness="1" CornerRadius="9" Margin="3,3,5,3" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                    <TextBlock Text="{Binding LanguagePairLabel}" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center" Margin="12,0"/>
+                </Border>
+                <Button Grid.Column="2" Style="{StaticResource FlatButton}" Background="Transparent" BorderThickness="0" Padding="0" Click="Minimize_Click" ToolTip="最小化">
+                    <TextBlock Style="{StaticResource IconText}" Text="&#xE921;" FontSize="11"/>
+                </Button>
+                <Button Grid.Column="3" Style="{StaticResource FlatButton}" Background="Transparent" BorderThickness="0" Padding="0" Click="Restore_Click" ToolTip="返回标准模式">
+                    <TextBlock Style="{StaticResource IconText}" Text="&#xE922;" FontSize="11"/>
+                </Button>
+                <Button Grid.Column="4" Style="{StaticResource FlatButton}" Background="Transparent" BorderThickness="0" Padding="0" Click="Close_Click" ToolTip="关闭迷你模式">
+                    <TextBlock Style="{StaticResource IconText}" Text="&#xE8BB;" FontSize="11"/>
+                </Button>
+            </Grid>
+
+            <Border Grid.Row="1" Background="#F0F1FF" BorderBrush="#E0E4F4" BorderThickness="1" CornerRadius="10" Margin="0,1,0,5">
+                <Grid Margin="10,6">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="42"/><ColumnDefinition Width="78"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                    <Border Grid.Column="0" Width="32" Height="32" CornerRadius="16" HorizontalAlignment="Left" VerticalAlignment="Center">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="#584BFF"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding State}" Value="{x:Static core:AssistantState.Recording}"><Setter Property="Background" Value="#F04450"/></DataTrigger>
+                                    <DataTrigger Binding="{Binding State}" Value="{x:Static core:AssistantState.SourceReady}"><Setter Property="Background" Value="#0CAF67"/></DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <TextBlock Foreground="White" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="17" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Text" Value="&#xE720;"/>
+                                    <Style.Triggers><DataTrigger Binding="{Binding State}" Value="{x:Static core:AssistantState.SourceReady}"><Setter Property="Text" Value="&#xE73E;"/></DataTrigger></Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Border>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Border Style="{StaticResource StatusWaveBar}" Width="3" Height="12" CornerRadius="2" Margin="1"/>
+                        <Border Style="{StaticResource StatusWaveBar}" Width="3" Height="20" CornerRadius="2" Margin="1"/>
+                        <Border Style="{StaticResource StatusWaveBar}" Width="3" Height="13" CornerRadius="2" Margin="1"/>
+                        <Border Style="{StaticResource StatusWaveBar}" Width="3" Height="27" CornerRadius="2" Margin="1"/>
+                        <Border Style="{StaticResource StatusWaveBar}" Width="3" Height="17" CornerRadius="2" Margin="1"/>
+                        <Border Style="{StaticResource StatusWaveBar}" Width="3" Height="10" CornerRadius="2" Margin="1"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding MiniStatusText}" FontWeight="SemiBold" FontSize="12"/>
+                        <TextBlock Text="{Binding MiniStatusHint}" FontSize="10" Foreground="#7D86A0"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <Border Grid.Row="2" Background="White" BorderBrush="#DFE4F0" BorderThickness="1" CornerRadius="9" Margin="0,2,0,3">
+                <Grid Margin="12,8">
+                    <Grid.RowDefinitions><RowDefinition Height="21"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                    <TextBlock Text="{Binding SourceResultHeader}" Foreground="#67718B" FontSize="11"/>
+                    <Button Grid.Row="0" HorizontalAlignment="Right" Style="{StaticResource FlatButton}" BorderThickness="0" Padding="0" ToolTip="复制识别结果" Command="{Binding CopySourceCommand}">
+                        <TextBlock Style="{StaticResource IconText}" Text="&#xE8C8;" FontSize="12"/>
+                    </Button>
+                    <TextBlock Grid.Row="1" Text="{Binding MiniSourcePreview}" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" FontSize="12" MaxHeight="39"/>
+                </Grid>
+            </Border>
+
+            <Border Grid.Row="3" Background="White" BorderBrush="#DFE4F0" BorderThickness="1" CornerRadius="9" Margin="0,2,0,0">
+                <Grid Margin="12,8">
+                    <Grid.RowDefinitions><RowDefinition Height="21"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                    <TextBlock Text="{Binding TranslationResultHeader}" Foreground="#67718B" FontSize="11"/>
+                    <Button Grid.Row="0" HorizontalAlignment="Right" Style="{StaticResource FlatButton}" BorderThickness="0" Padding="0" ToolTip="复制译文" Command="{Binding CopyTranslationCommand}">
+                        <TextBlock Style="{StaticResource IconText}" Text="&#xE8C8;" FontSize="12"/>
+                    </Button>
+                    <TextBlock Grid.Row="1" Text="{Binding MiniTranslationPreview}" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" FontSize="12" MaxHeight="39"/>
+                </Grid>
+            </Border>
+            <Popup PlacementTarget="{Binding ElementName=MiniShell}" Placement="Bottom" HorizontalOffset="55" VerticalOffset="4" StaysOpen="True" AllowsTransparency="True" IsOpen="{Binding HasSuccess, Mode=OneWay}">
+                <Border Background="#1D293B" CornerRadius="8" Padding="12,9">
+                    <Border.Effect><DropShadowEffect Color="#1D293B" BlurRadius="12" ShadowDepth="3" Opacity="0.25"/></Border.Effect>
+                    <TextBlock Text="{Binding SuccessText}" Foreground="White" FontSize="11" TextWrapping="Wrap" MaxWidth="280"/>
+                </Border>
+            </Popup>
+        </Grid>
+    </Border>
+</Window>
