@@ -2,6 +2,8 @@
 
 **许可证：** [MIT](LICENSE)。**Code signing policy：** [代码签名政策](docs/code-signing-policy.md)。当前提供的安装器尚未经过受信任的代码签名；项目计划申请 SignPath Foundation 的免费开源签名，能否获批取决于其审核。
 
+本仓库的 `main` 只保存可构建源码、界面资源和文档。EXE、DLL、模型、本地下载目录与构建产物均不提交。GitHub Actions 的 [源码验证](.github/workflows/verify.yml)在每次推送时运行；[安装器构建](.github/workflows/package.yml)只在维护者手动触发时运行，并将未签名安装器作为短期 Actions 构建产物保存，不会自动发布到 GitHub Release。
+
 Windows 11 x64 本地语音翻译助手。点击麦克风或按 `Alt + Space` 开始和停止录音。主窗口可选择中文、英语、法语、日语、俄语作为识别语言和翻译目标，并可一键交换方向。程序使用本机 whisper.cpp 与 llama.cpp；原文和译文都可以编辑、复制，原文也可从剪贴板粘贴。默认自动翻译和自动复制译文，不会自动粘贴或发送 Enter。
 
 ## 运行

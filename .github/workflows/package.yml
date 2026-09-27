@@ -1,0 +1,44 @@
+name: Build unsigned installer
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '10.0.x'
+      - name: Acquire verified Inno Setup compiler
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $url = 'https://github.com/jrsoftware/issrc/releases/download/is-7_1_0/innosetup-7.1.0-x64.exe'
+          $expected = '0362a383ed217d4c4239b5933866dd96d3eb2102737da92f80f6057a4b40df2f'
+          $download = Join-Path $env:RUNNER_TEMP 'innosetup-7.1.0-x64.exe'
+          $destination = Join-Path $PWD '.local/tools/InnoSetup7'
+          Invoke-WebRequest -Uri $url -OutFile $download
+          $actual = (Get-FileHash -Algorithm SHA256 -LiteralPath $download).Hash.ToLowerInvariant()
+          if ($actual -ne $expected) { throw 'Inno Setup download hash mismatch.' }
+          & $download '/PORTABLE=1' '/VERYSILENT' '/SP-' '/SUPPRESSMSGBOXES' '/NORESTART' '/CURRENTUSER' "/DIR=$destination"
+          if ($LASTEXITCODE -ne 0) { throw "Inno Setup extraction failed: $LASTEXITCODE" }
+          if (-not (Test-Path -LiteralPath (Join-Path $destination 'ISCC.exe'))) { throw 'ISCC.exe missing.' }
+      - name: Acquire verified local runtimes and models
+        shell: pwsh
+        run: |
+          ./setup-whisper.ps1
+          ./setup-translation.ps1
+      - name: Build and package
+        shell: pwsh
+        run: ./build-installer.ps1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: VoxMate-unsigned-installer
+          path: artifacts/installer/*
+          if-no-files-found: error
+          retention-days: 7

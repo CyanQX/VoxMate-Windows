@@ -1,0 +1,26 @@
+name: Verify source
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '10.0.x'
+      - name: Check tracked source tree
+        shell: pwsh
+        run: |
+          $forbidden = @(git ls-files | Where-Object { $_ -match '(?i)(^|/)(bin|obj|artifacts|\.local)(/|$)|\.(exe|dll|pdb|gguf|bin|zip|pfx|p12|pem|key)$' })
+          if ($forbidden.Count) { throw "Binary or private files are tracked: $($forbidden -join ', ')" }
+      - name: Build and test
+        shell: pwsh
+        run: ./build.ps1
