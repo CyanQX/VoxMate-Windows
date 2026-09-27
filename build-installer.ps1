@@ -7,7 +7,7 @@ $outputDirectory = Join-Path $root 'artifacts/installer'
 
 [xml]$project = Get-Content -LiteralPath $projectPath -Raw
 $version = [string]$project.Project.PropertyGroup.Version
-if ([string]::IsNullOrWhiteSpace($version)) { throw '应用项目没有 Version 属性。' }
+if ([string]::IsNullOrWhiteSpace($version)) { throw 'The application project has no Version property.' }
 
 $candidates = @(
     (Join-Path $root '.local/tools/InnoSetup7/ISCC.exe'),
@@ -20,7 +20,7 @@ if (-not $compiler) {
     if ($command) { $compiler = $command.Source }
 }
 if (-not $compiler) {
-    throw '找不到 Inno Setup 7 编译器 ISCC.exe。请从 https://jrsoftware.org/isdl.php 安装 Inno Setup 7，或将便携版放在 .local/tools/InnoSetup7。'
+    throw 'Inno Setup 7 compiler ISCC.exe was not found. Install Inno Setup 7 from https://jrsoftware.org/isdl.php or place its portable files in .local/tools/InnoSetup7.'
 }
 
 & (Join-Path $root 'build.ps1')
@@ -40,7 +40,7 @@ foreach ($relative in @(
     'licenses/README.md'
 )) {
     if (-not (Test-Path -LiteralPath (Join-Path $publishDirectory $relative))) {
-        throw "安装器输入缺少文件：$relative"
+        throw "Installer input is missing: $relative"
     }
 }
 
@@ -49,7 +49,7 @@ New-Item -ItemType Directory -Force -Path $outputDirectory | Out-Null
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 $installer = Join-Path $outputDirectory "VoxMate-Setup-$version-win-x64.exe"
-if (-not (Test-Path -LiteralPath $installer)) { throw "编译结束但未找到安装器：$installer" }
+if (-not (Test-Path -LiteralPath $installer)) { throw "Compilation finished but the installer was not found: $installer" }
 $hash = (Get-FileHash -Algorithm SHA256 -LiteralPath $installer).Hash.ToLowerInvariant()
 $checksumFile = Join-Path $outputDirectory "VoxMate-Setup-$version-win-x64.sha256"
 Set-Content -LiteralPath $checksumFile -Value "$hash  $(Split-Path -Path $installer -Leaf)" -Encoding ascii
@@ -57,5 +57,5 @@ $releaseNotes = Join-Path $root "docs/release-notes-$version.md"
 if (Test-Path -LiteralPath $releaseNotes) {
     Copy-Item -LiteralPath $releaseNotes -Destination (Join-Path $outputDirectory 'RELEASE_NOTES.md') -Force
 }
-Write-Host "安装器：$installer"
+Write-Host "Installer: $installer"
 Write-Host "SHA-256：$hash"

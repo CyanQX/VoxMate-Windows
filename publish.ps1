@@ -23,20 +23,20 @@ Get-ChildItem -LiteralPath (Join-Path $PSScriptRoot 'licenses') -File | Copy-Ite
 if ($BundleModels) {
     $modelSource = Join-Path $env:LOCALAPPDATA 'VoiceTranslator/Models'
     $modelTarget = Join-Path $outputDirectory 'Models'
-    if (-not (Test-Path -LiteralPath $modelSource)) { throw '本机模型目录不存在，请先运行 setup-whisper.ps1 和 setup-translation.ps1。' }
+    if (-not (Test-Path -LiteralPath $modelSource)) { throw 'The local model directory is missing. Run setup-whisper.ps1 and setup-translation.ps1 first.' }
     New-Item -ItemType Directory -Force -Path $modelTarget | Out-Null
     foreach ($name in @('ggml-base.bin', 'qwen2.5-0.5b-instruct-q4_k_m.gguf')) {
         $source = Join-Path $modelSource $name
-        if (-not (Test-Path -LiteralPath $source)) { throw "缺少模型：$source" }
+        if (-not (Test-Path -LiteralPath $source)) { throw "Missing model: $source" }
         Copy-Item -LiteralPath $source -Destination $modelTarget -Force
     }
     foreach ($tool in @('whisper', 'llama')) {
         $source = Join-Path $PSScriptRoot ".local/$tool"
-        if (-not (Test-Path -LiteralPath $source)) { throw "缺少本地运行时：$source" }
+        if (-not (Test-Path -LiteralPath $source)) { throw "Missing local runtime: $source" }
         $target = Join-Path $outputDirectory ".local/$tool"
         New-Item -ItemType Directory -Force -Path $target | Out-Null
         Get-ChildItem -LiteralPath $source -Force | Copy-Item -Destination $target -Recurse -Force
     }
 }
-Write-Host "发布完成：$outputDirectory"
+Write-Host "Publish complete: $outputDirectory"
 

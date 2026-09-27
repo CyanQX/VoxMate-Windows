@@ -1,31 +1,31 @@
 # VoxMate 0.1.0
 
-Windows 11 x64 本地语音翻译助手。提供中文、英语、法语、日语、俄语的识别语言与翻译目标切换、迷你悬浮窗、全局快捷键、文本复制与粘贴、翻译模式和可选历史记录。
+VoxMate is an offline voice transcription and translation assistant for Windows 11 x64. It supports choosing and swapping recognition and target languages among Chinese, English, French, Japanese, and Russian, as well as a floating mini window, global shortcut, text copy and paste controls, translation modes, and optional history.
 
-## 下载与安装
+## Download and installation
 
-下载 `VoxMate-Setup-0.1.0-win-x64.exe`，运行安装向导即可安装到当前用户账户，无需管理员权限。安装包已经包含 .NET 运行时、语音识别模型和翻译模型，大小约 643 MiB。程序可从开始菜单启动，也可在安装时选择桌面快捷方式。通过 Windows「已安装的应用」卸载。
+Download `VoxMate-Setup-0.1.0-win-x64.exe` and follow the installer to install for the current Windows user. Administrator privileges are not required. The installer includes the .NET runtime, speech recognition model, and translation model, and is approximately 643 MiB. Launch VoxMate from the Start menu or choose the optional desktop shortcut during installation. Uninstall it through Windows Installed apps.
 
-`VoxMate-Setup-0.1.0-win-x64.sha256` 提供文件的 SHA-256 校验值。PowerShell 校验命令：
+`VoxMate-Setup-0.1.0-win-x64.sha256` contains the file's SHA-256 checksum. Verify it in PowerShell:
 
 ```powershell
 Get-FileHash -Algorithm SHA256 .\VoxMate-Setup-0.1.0-win-x64.exe
 ```
 
-安装包未进行代码签名。Windows 可能显示来源提示；请只从项目的官方 GitHub Release 页面下载，并在运行前核对校验值。
+The installer is unsigned. Windows may display an unknown publisher warning. Download only from the project's official GitHub Release page and verify the checksum before running it.
 
-## 主要功能
+## Main features
 
-- 点击麦克风或按 `Alt + Space` 开始、停止录音；录音和识别在后台处理。
-- 交换识别语言与目标语言；支持直接翻译、AI Prompt、技术开发、学术和商务模式。
-- 原文和译文可编辑及复制，原文可粘贴剪贴板内容；默认自动复制译文。
-- 主窗口置顶状态与设置同步；关闭主窗口默认缩到系统托盘。
-- 历史记录默认关闭，可在设置中启用。
+- Click the microphone or press `Alt + Space` to start and stop recording. Recording and recognition run in the background.
+- Swap the recognition and target languages. Translation modes include Direct, AI Prompt, Technical, Academic, and Business.
+- Edit and copy both source and translated text, and paste clipboard text into the source card. Automatic copying of translations is enabled by default.
+- The main window's always-on-top setting stays in sync with Settings. Closing the main window minimizes it to the system tray by default.
+- History is disabled by default and can be enabled in Settings.
 
-## 已知限制与数据
+## Known limitations and data
 
-本版本使用轻量本地翻译模型，法语、日语、俄语等方向可能出现译法不自然的情况。在线翻译 API、GPU 推理、自动粘贴和自动更新尚未接入。默认离线识别及翻译的本地数据处理、设置与历史记录位置见随包 `docs/privacy.md`。第三方许可见随包 `licenses/README.md`。
+This release uses a lightweight local translation model. French, Japanese, Russian, and other translations may sound unnatural. Online translation APIs, GPU inference, automatic pasting, and automatic updates are not implemented. For local data processing, settings, and history locations, see the bundled `docs/privacy.md`. Third-party licenses are listed in `licenses/README.md`.
 
-VoxMate 项目源码采用 MIT 许可证，见随包 `LICENSE`。当前安装器尚未获得受信任的代码签名；项目计划申请 SignPath Foundation 的免费开源签名服务，申请获批前不得将安装器描述为已签名。获批后的签名致谢措辞为 “Free code signing provided by SignPath.io, certificate by SignPath Foundation”。[Code signing policy / 代码签名政策](https://github.com/CyanQX/VoxMate-Windows/blob/main/docs/code-signing-policy.md) 说明维护者角色与签名范围。
+The VoxMate source code is licensed under MIT; see the bundled `LICENSE`. The installer remains unsigned while the project awaits review of its SignPath Foundation open source signing application. It must not be described as signed unless a future release actually receives a trusted signature. If approved, the required acknowledgment will read “Free code signing provided by SignPath.io, certificate by SignPath Foundation.” The [code signing policy](https://github.com/CyanQX/VoxMate-Windows/blob/main/docs/code-signing-policy.md) describes maintainer roles and the signing scope.
 
-源码与构建说明见仓库 `README.md`。安装器未在构建电脑上运行或安装；本次发布提供未经代码签名的初始版本，供用户自行核对来源及 SHA-256。
+The repository `README.md` contains source and build instructions. The installer was not run or installed on the build computer. This initial unsigned release lets users verify its source and SHA-256 checksum themselves.

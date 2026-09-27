@@ -15,7 +15,7 @@ $downloadDirectory = Join-Path $env:TEMP ('VoiceTranslator-setup-' + [guid]::New
 function Assert-Hash([string]$path, [string]$expected) {
     $actual = (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant()
     if ($actual -ne $expected) {
-        throw "SHA-256 校验失败：$path (实际 $actual)"
+        throw "SHA-256 verification failed: $path (actual $actual)"
     }
 }
 
@@ -24,13 +24,13 @@ try {
     $exePath = Join-Path $toolDirectory 'whisper-cli.exe'
     if (-not (Test-Path -LiteralPath $exePath)) {
         $zipPath = Join-Path $downloadDirectory 'whisper-bin-x64.zip'
-        Write-Host '下载 whisper.cpp Windows x64 二进制文件...'
+        Write-Host 'Downloading whisper.cpp Windows x64 binaries...'
         Invoke-WebRequest -Uri $releaseUrl -OutFile $zipPath
         Assert-Hash $zipPath $releaseSha256
         $expanded = Join-Path $downloadDirectory 'expanded'
         Expand-Archive -LiteralPath $zipPath -DestinationPath $expanded
         $sourceExe = Get-ChildItem -LiteralPath $expanded -Recurse -File -Filter 'whisper-cli.exe' | Select-Object -First 1
-        if ($null -eq $sourceExe) { throw '下载包中找不到 whisper-cli.exe。' }
+        if ($null -eq $sourceExe) { throw 'whisper-cli.exe was not found in the downloaded archive.' }
         Get-ChildItem -LiteralPath $sourceExe.DirectoryName -Force |
             Copy-Item -Destination $toolDirectory -Recurse -Force
     }
@@ -38,12 +38,12 @@ try {
     $modelPath = Join-Path $modelDirectory 'ggml-base.bin'
     if (-not (Test-Path -LiteralPath $modelPath)) {
         $temporaryModel = Join-Path $downloadDirectory 'ggml-base.bin'
-        Write-Host '下载多语言 Whisper base 模型（约 148 MB）...'
+        Write-Host 'Downloading the multilingual Whisper base model (about 148 MB)...'
         & curl.exe -fL --retry 2 --connect-timeout 20 --max-time 900 --output $temporaryModel $modelUrl
         if ($LASTEXITCODE -ne 0) {
-            Write-Host '模型源站不可用，尝试镜像下载并进行同样的 SHA-256 校验...'
+            Write-Host 'The primary model source is unavailable. Trying the mirror with the same SHA-256 verification...'
             & curl.exe -fL --retry 2 --connect-timeout 20 --max-time 900 --output $temporaryModel $modelMirrorUrl
-            if ($LASTEXITCODE -ne 0) { throw "Whisper 模型下载失败（curl 退出码 $LASTEXITCODE）。" }
+            if ($LASTEXITCODE -ne 0) { throw "Whisper model download failed (curl exit code $LASTEXITCODE)." }
         }
         Assert-Hash $temporaryModel $modelSha256
         Move-Item -LiteralPath $temporaryModel -Destination $modelPath
@@ -60,8 +60,8 @@ try {
     $settings.WhisperModelPath = $modelPath
     $settings | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $settingsPath -Encoding UTF8
     Write-Host "whisper.cpp: $exePath"
-    Write-Host "多语言模型: $modelPath"
-    Write-Host '配置完成。'
+    Write-Host "Multilingual model: $modelPath"
+    Write-Host 'Setup complete.'
 }
 finally {
     $resolvedDownload = [IO.Path]::GetFullPath($downloadDirectory)

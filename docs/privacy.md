@@ -1,13 +1,13 @@
-# VoxMate 隐私说明
+# VoxMate Privacy Policy
 
-VoxMate 的默认语音识别和翻译在本机完成。程序将麦克风录音交给随包的 whisper.cpp 模型识别，再将原文交给随包的 llama.cpp / Qwen 模型翻译；这些功能不要求账号，也不会主动将录音或文本上传到 VoxMate 服务。
+VoxMate processes speech recognition and translation locally by default. The bundled whisper.cpp model transcribes microphone recordings, and the bundled llama.cpp / Qwen model translates the source text. These features require no account and do not upload recordings or text to a VoxMate service.
 
-录音、识别结果和翻译输出会临时写入 Windows 临时目录中的 `VoiceTranslator` 子目录，正常处理完成或取消后由程序删除。若程序或系统异常退出，残留临时文件可能保留；下次录音会清理超过一天的旧录音文件。用户可以在 Windows 临时目录中自行检查。
+Recordings, recognition results, and translations are written temporarily to a `VoiceTranslator` subdirectory in the Windows temporary directory. They are deleted after normal processing or cancellation. Temporary files may remain after an app or system crash; the next recording removes old audio files more than one day old. Users can inspect their Windows temporary directory.
 
-设置保存在 `%LOCALAPPDATA%\VoiceTranslator\settings.json`。历史记录默认关闭；用户启用后，识别原文与译文会保存在 `%LOCALAPPDATA%\VoiceTranslator\history.json`，并可在应用内逐条删除或清空。关闭历史记录不会自动删除之前保存的历史文件。
+Settings are stored at `%LOCALAPPDATA%\VoiceTranslator\settings.json`. History is disabled by default. When enabled, source and translated text are stored at `%LOCALAPPDATA%\VoiceTranslator\history.json`. Entries can be searched, copied, deleted individually, or cleared in the app. Disabling history does not automatically delete previously saved history.
 
-默认启用自动复制译文，因此译文可能出现在 Windows 剪贴板及用户启用的剪贴板历史中。用户可在设置中关闭自动复制。VoxMate 不会自动向其他应用粘贴或发送文本。
+Automatic copying of translations is enabled by default, so translations may appear in the Windows clipboard and, if enabled, clipboard history. Users can disable automatic copying in Settings. VoxMate does not paste into other apps or send text automatically.
 
-安装器默认将程序和随包模型放入当前用户的 `%LOCALAPPDATA%\Programs\VoxMate`。卸载程序不会自动删除上述用户设置及历史记录；若需要完全清除数据，请在退出程序后自行删除 `%LOCALAPPDATA%\VoiceTranslator` 目录。
+The installer places the app and bundled models in the current user's `%LOCALAPPDATA%\Programs\VoxMate` directory by default. Uninstalling does not automatically remove user settings or history. To remove that data, exit the app and delete `%LOCALAPPDATA%\VoiceTranslator` manually.
 
-构建者运行 `setup-whisper.ps1` 和 `setup-translation.ps1` 下载模型及运行时时会连接脚本中指定的下载源。发布的完整安装器已捆绑这些文件，最终用户安装和使用默认本地功能时无需再下载模型。
+When a developer runs `setup-whisper.ps1` or `setup-translation.ps1`, the scripts connect to the download sources specified in them. The full installer already bundles these runtimes and models, so end users do not need to download models to install or use the default offline features.

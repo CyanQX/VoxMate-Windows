@@ -13,7 +13,7 @@ $downloadDirectory = Join-Path $env:TEMP ('VoiceTranslator-translation-' + [guid
 
 function Assert-Hash([string]$path, [string]$expected) {
     $actual = (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant()
-    if ($actual -ne $expected) { throw "SHA-256 校验失败：$path (实际 $actual)" }
+    if ($actual -ne $expected) { throw "SHA-256 verification failed: $path (actual $actual)" }
 }
 
 New-Item -ItemType Directory -Force -Path $toolDirectory, $modelDirectory, $downloadDirectory | Out-Null
@@ -21,22 +21,22 @@ try {
     $exePath = Join-Path $toolDirectory 'llama-cli.exe'
     if (-not (Test-Path -LiteralPath $exePath)) {
         $zipPath = Join-Path $downloadDirectory 'llama-win-cpu-x64.zip'
-        Write-Host '下载 llama.cpp Windows CPU 运行时...'
+        Write-Host 'Downloading the llama.cpp Windows CPU runtime...'
         Invoke-WebRequest -Uri $releaseUrl -OutFile $zipPath
         Assert-Hash $zipPath $releaseSha256
         $expanded = Join-Path $downloadDirectory 'expanded'
         Expand-Archive -LiteralPath $zipPath -DestinationPath $expanded
         $sourceExe = Get-ChildItem -LiteralPath $expanded -Recurse -File -Filter 'llama-cli.exe' | Select-Object -First 1
-        if ($null -eq $sourceExe) { throw '下载包中找不到 llama-cli.exe。' }
+        if ($null -eq $sourceExe) { throw 'llama-cli.exe was not found in the downloaded archive.' }
         Get-ChildItem -LiteralPath $sourceExe.DirectoryName -Force | Copy-Item -Destination $toolDirectory -Recurse -Force
     }
 
     $modelPath = Join-Path $modelDirectory 'qwen2.5-0.5b-instruct-q4_k_m.gguf'
     if (-not (Test-Path -LiteralPath $modelPath)) {
         $temporaryModel = Join-Path $downloadDirectory 'qwen.gguf'
-        Write-Host '下载 Qwen2.5 0.5B Q4_K_M 模型（约 491 MB）...'
+        Write-Host 'Downloading the Qwen2.5 0.5B Q4_K_M model (about 491 MB)...'
         & curl.exe -fL --retry 3 --connect-timeout 20 --max-time 900 --output $temporaryModel $modelUrl
-        if ($LASTEXITCODE -ne 0) { throw "模型下载失败（curl 退出码 $LASTEXITCODE）。" }
+        if ($LASTEXITCODE -ne 0) { throw "Model download failed (curl exit code $LASTEXITCODE)." }
         Assert-Hash $temporaryModel $modelSha256
         Move-Item -LiteralPath $temporaryModel -Destination $modelPath
     }
@@ -52,8 +52,8 @@ try {
     $settings | Add-Member -NotePropertyName LlamaModelPath -NotePropertyValue $modelPath -Force
     $settings | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $settingsPath -Encoding UTF8
     Write-Host "llama.cpp: $exePath"
-    Write-Host "本地翻译模型: $modelPath"
-    Write-Host '配置完成。'
+    Write-Host "Local translation model: $modelPath"
+    Write-Host 'Setup complete.'
 }
 finally {
     $resolvedDownload = [IO.Path]::GetFullPath($downloadDirectory)

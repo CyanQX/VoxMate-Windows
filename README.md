@@ -1,18 +1,16 @@
 # VoxMate
 
-**许可证：** [MIT](LICENSE)。**Code signing policy：** [代码签名政策](docs/code-signing-policy.md)。当前提供的安装器尚未经过受信任的代码签名；项目已提交 SignPath Foundation 免费开源签名申请，正在等待审核，能否获批取决于其决定。获批后的签名致谢措辞为 “Free code signing provided by SignPath.io, certificate by SignPath Foundation”。
+VoxMate is an offline voice transcription and translation assistant for Windows 11 x64. Click the microphone or press `Alt + Space` to start and stop recording. Choose Chinese, English, French, Japanese, or Russian as the recognition and translation languages, and swap the direction with one click. Local whisper.cpp and llama.cpp runtimes process speech and text. Both text cards are editable and copyable; you can also paste source text from the clipboard. Automatic translation and copying of the translation are enabled by default. VoxMate never pastes into another app or presses Enter automatically.
 
-[SignPath 签名接入说明](docs/signpath-setup.md)列出了获批后的构建和验证步骤；目前工作流默认只生成未签名安装器。
+**License:** [MIT](LICENSE). **Code signing policy:** [policy and maintainer roles](docs/code-signing-policy.md). The current installer is unsigned. An application for free SignPath Foundation open source code signing has been submitted and is awaiting review; approval is not guaranteed. If approved, the required acknowledgment will read “Free code signing provided by SignPath.io, certificate by SignPath Foundation.” The [SignPath integration guide](docs/signpath-setup.md) describes the build and verification steps after approval.
 
-本仓库的 `main` 只保存可构建源码、界面资源和文档。EXE、DLL、模型、本地下载目录与构建产物均不提交。GitHub Actions 的 [源码验证](.github/workflows/verify.yml)在每次推送时运行；[安装器构建](.github/workflows/package.yml)只在维护者手动触发时运行，并将未签名安装器作为短期 Actions 构建产物保存，不会自动发布到 GitHub Release。
+The `main` branch contains buildable source code, UI assets, and documentation. EXE and DLL files, models, local downloads, and build outputs are excluded. GitHub Actions [verifies the source](.github/workflows/verify.yml) on every push. Maintainers trigger the [installer workflow](.github/workflows/package.yml) manually; its default output is a short-lived, unsigned Actions artifact and it does not publish a GitHub Release automatically.
 
-Windows 安装包与 SHA-256 校验文件见 [v0.1.0 Release](https://github.com/CyanQX/VoxMate-Windows/releases/tag/v0.1.0)。这个初始安装包未经代码签名，下载后请核对校验值；发行说明见 [版本说明](docs/release-notes-0.1.0.md)。
+Download the Windows installer and its SHA-256 checksum from the [v0.1.0 Release](https://github.com/CyanQX/VoxMate-Windows/releases/tag/v0.1.0). This initial installer is unsigned. Check the checksum before running it, and see the [release notes](docs/release-notes-0.1.0.md) for details.
 
-Windows 11 x64 本地语音翻译助手。点击麦克风或按 `Alt + Space` 开始和停止录音。主窗口可选择中文、英语、法语、日语、俄语作为识别语言和翻译目标，并可一键交换方向。程序使用本机 whisper.cpp 与 llama.cpp；原文和译文都可以编辑、复制，原文也可从剪贴板粘贴。默认自动翻译和自动复制译文，不会自动粘贴或发送 Enter。
+## Run from source
 
-## 运行
-
-需要 Windows 11 x64、.NET 10 SDK 和麦克风。在 PowerShell 中执行：
+You need Windows 11 x64, the .NET 10 SDK, and a microphone. Run these commands in PowerShell:
 
 ```powershell
 ./setup-whisper.ps1
@@ -20,23 +18,23 @@ Windows 11 x64 本地语音翻译助手。点击麦克风或按 `Alt + Space` �
 dotnet run --project src/VoiceTranslator.App -c Release
 ```
 
-两个安装脚本下载本地运行时与模型，使用固定 SHA-256 校验。whisper.cpp 二进制来自[官方 v1.9.2 发布页](https://github.com/ggml-org/whisper.cpp/releases/tag/v1.9.2)，多语言模型来自 [whisper.cpp 模型仓库](https://huggingface.co/ggerganov/whisper.cpp)。llama.cpp 二进制来自[官方 b11195 发布页](https://github.com/ggml-org/llama.cpp/releases/tag/b11195)；翻译模型是 [Qwen 官方 Qwen2.5 0.5B Instruct GGUF](https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF)。翻译模型下载使用镜像地址，但校验值对应官方模型文件。
+The setup scripts download the local runtimes and models and verify fixed SHA-256 checksums. The whisper.cpp binaries come from its [official v1.9.2 release](https://github.com/ggml-org/whisper.cpp/releases/tag/v1.9.2), and the multilingual model comes from the [whisper.cpp model repository](https://huggingface.co/ggerganov/whisper.cpp). The llama.cpp binaries come from its [official b11195 release](https://github.com/ggml-org/llama.cpp/releases/tag/b11195). The translation model is the [official Qwen2.5 0.5B Instruct GGUF](https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF). The translation model download uses a mirror, but its checksum matches the official model file.
 
-普通设置位于 `%LOCALAPPDATA%\VoiceTranslator\settings.json`，模型位于 `%LOCALAPPDATA%\VoiceTranslator\Models\`。录音和转录临时文件使用后删除。本地翻译不会上传文字。历史记录默认关闭；启用后保存在 `%LOCALAPPDATA%\VoiceTranslator\history.json`，可搜索、复制、逐条删除或清空。
+Settings are stored at `%LOCALAPPDATA%\VoiceTranslator\settings.json` and models at `%LOCALAPPDATA%\VoiceTranslator\Models\`. Temporary recording and transcription files are removed after use. Offline translation does not upload text. History is off by default; when enabled, it is saved at `%LOCALAPPDATA%\VoiceTranslator\history.json` and can be searched, copied, deleted entry by entry, or cleared.
 
-## 功能
+## Features
 
-- 标准主窗口、同步的置顶开关、迷你悬浮窗口、录音和处理状态。
-- 16 kHz 单声道 WAV 录音；识别启动在后台执行，设备无响应时提示超时，不阻塞窗口。
-- 五种识别及目标语言、双向交换；本地翻译提供直接翻译／AI Prompt／技术开发／学术／商务模式模板。
-- 文本卡片内复制、粘贴及翻译操作；顶部清空按钮。编辑原文会清除过期译文。
-- 基础设置、语音识别设置、翻译设置、麦克风和模型文件选择；主窗口与设置中的置顶状态同步。
-- 历史记录（默认关闭）、系统托盘菜单、`Alt + Space` 全局快捷键（若系统未占用）、翻译完成提示。
-- 关闭主窗口时默认缩至托盘；在托盘菜单选择「退出」可完整关闭。
+- Main window, synchronized always-on-top setting, floating mini window, and recording and processing states.
+- 16 kHz mono WAV recording. Recognition starts in the background; an unresponsive microphone produces a timeout message without freezing the window.
+- Five recognition and target languages with a swap control. Local translation offers Direct, AI Prompt, Technical, Academic, and Business prompt templates.
+- Copy, paste, and translate controls in the text cards, plus a Clear button in the header. Editing source text clears an outdated translation.
+- Basic, speech recognition, and translation settings, including microphone and model file selection. The always-on-top setting stays in sync with the main window.
+- Optional history, a system tray menu, an `Alt + Space` global shortcut when available, and a translation completion notice.
+- Closing the main window minimizes it to the tray by default. Choose Exit from the tray menu to quit fully.
 
-在线 API、GPU 推理、语音自动结束、自动粘贴、更新服务目前未接入；对应控件已明确禁用或标注。当前默认的 0.5B 轻量模型适合快速离线体验，日语、俄语等方向的措辞质量可能有限。可在翻译设置中选择其它兼容 GGUF 模型。
+Online APIs, GPU inference, automatic end-of-speech detection, automatic pasting, and update delivery are not implemented. Their controls are disabled or labeled accordingly. The default lightweight 0.5B model is intended for a quick offline experience; translations involving Japanese or Russian may be less fluent. You can select another compatible GGUF model in Translation Settings.
 
-## 构建、测试与发布
+## Build, test, and publish
 
 ```powershell
 ./build.ps1
@@ -45,26 +43,26 @@ dotnet run --project src/VoiceTranslator.App -c Release
 ./publish.ps1 -BundleModels -OutputDirectory artifacts/publish/win-x64-new
 ```
 
-`build.ps1` 执行 restore、Release build 与测试。`publish.ps1` 生成 Windows x64 自包含 .NET 程序到 `artifacts/publish/win-x64/`，并附上两个模型安装脚本。加 `-BundleModels` 会将本机已下载的运行时和模型打包进去，发布目录复制到另一台 Windows 11 x64 设备后即可离线使用。首次下载和捆绑模型约需 650 MB 额外磁盘空间。
+`build.ps1` restores dependencies, builds the Release configuration, and runs tests. `publish.ps1` creates a self-contained Windows x64 .NET application in `artifacts/publish/win-x64/` and includes both model setup scripts. Add `-BundleModels` to include the locally downloaded runtimes and models. The resulting directory can run offline on another Windows 11 x64 machine. The initial downloads and bundled models require approximately 650 MB of additional disk space.
 
-### 生成单文件安装器
+### Build a standalone installer
 
-先按「运行」一节下载并校验本地运行时与模型，再准备 [Inno Setup 7](https://jrsoftware.org/isdl.php) 的 `ISCC.exe`。构建脚本会优先查找 `.local/tools/InnoSetup7/ISCC.exe`，然后查找系统安装目录或 `PATH`。运行：
+Download and verify the local runtimes and models as described above, then make the [Inno Setup 7](https://jrsoftware.org/isdl.php) compiler `ISCC.exe` available. The build script checks `.local/tools/InnoSetup7/ISCC.exe`, standard installation directories, and then `PATH`.
 
 ```powershell
 ./build-installer.ps1
 ```
 
-脚本重新构建、测试并发布含模型的 Windows x64 自包含程序，生成以下文件：
+The script rebuilds, tests, and publishes the self-contained Windows x64 app with bundled models, then creates:
 
-- `artifacts/installer/VoxMate-Setup-0.1.0-win-x64.exe`：给最终用户下载的独立安装器。
-- `artifacts/installer/VoxMate-Setup-0.1.0-win-x64.sha256`：对应的 SHA-256 校验值。
-- `artifacts/installer/RELEASE_NOTES.md`：可用于 GitHub Release 的说明。
+- `artifacts/installer/VoxMate-Setup-0.1.0-win-x64.exe`: standalone installer for users.
+- `artifacts/installer/VoxMate-Setup-0.1.0-win-x64.sha256`: SHA-256 checksum for that installer.
+- `artifacts/installer/RELEASE_NOTES.md`: text suitable for a GitHub Release.
 
-安装器按当前用户安装至 `%LOCALAPPDATA%\Programs\VoxMate`，无需管理员权限；包含程序图标、开始菜单快捷方式、可选桌面快捷方式以及卸载入口。重复运行更新版安装器会使用同一个应用标识升级现有安装。上传到 GitHub 时，可将 EXE 和 `.sha256` 文件作为 Release 附件，并将 `RELEASE_NOTES.md` 作为说明。安装器目前未经过代码签名；项目构建流程不会自动运行安装程序。隐私说明见 [docs/privacy.md](docs/privacy.md)，第三方许可索引见 [licenses/README.md](licenses/README.md)。
+The installer installs per user to `%LOCALAPPDATA%\Programs\VoxMate` without administrator rights. It includes the app icon, Start menu shortcut, optional desktop shortcut, and an uninstall entry. A newer installer uses the same application ID to upgrade an existing installation. Attach the EXE and `.sha256` file to a GitHub Release and use `RELEASE_NOTES.md` as its description. The current installer is unsigned, and the build process never runs or installs it. See the [privacy policy](docs/privacy.md) and [third-party license index](licenses/README.md).
 
-若旧版仍从默认发布目录运行，可用 `-OutputDirectory` 指定新目录，再退出旧版并启动新版。
+If an older app instance still uses the default publish directory, specify another directory with `-OutputDirectory`, exit the old app, and then start the new build.
 
-也可直接执行 `dotnet restore VoiceTranslator.sln`、`dotnet build VoiceTranslator.sln -c Release`、`dotnet test VoiceTranslator.sln -c Release`，以及 `dotnet publish src/VoiceTranslator.App/VoiceTranslator.App.csproj -c Release -r win-x64 --self-contained true`。
+You can also run `dotnet restore VoiceTranslator.sln`, `dotnet build VoiceTranslator.sln -c Release`, `dotnet test VoiceTranslator.sln -c Release`, and `dotnet publish src/VoiceTranslator.App/VoiceTranslator.App.csproj -c Release -r win-x64 --self-contained true` directly.
 
-界面截图和核对记录见 [docs/design-qa.md](docs/design-qa.md)。
+See the [UI screenshots and verification notes](docs/design-qa.md).
