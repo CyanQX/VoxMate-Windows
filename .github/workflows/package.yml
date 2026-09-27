@@ -1,9 +1,16 @@
-name: Build unsigned installer
+name: Build Windows installer
 
 on:
   workflow_dispatch:
+    inputs:
+      sign_with_signpath:
+        description: Submit the GitHub-built installer to SignPath after approval
+        type: boolean
+        required: true
+        default: false
 
 permissions:
+  actions: read
   contents: read
 
 jobs:
@@ -14,6 +21,14 @@ jobs:
       - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '10.0.x'
+      - name: Read application version
+        id: app-version
+        shell: pwsh
+        run: |
+          [xml]$project = Get-Content -LiteralPath src/VoiceTranslator.App/VoiceTranslator.App.csproj -Raw
+          $version = [string]$project.Project.PropertyGroup.Version
+          if ($version -notmatch '^\d+\.\d+\.\d+$') { throw "Invalid application version: $version" }
+          "version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
       - name: Acquire verified Inno Setup compiler
         shell: pwsh
         run: |
@@ -36,9 +51,66 @@ jobs:
       - name: Build and package
         shell: pwsh
         run: ./build-installer.ps1
-      - uses: actions/upload-artifact@v4
+      - name: Upload unsigned installer for origin verification
+        id: unsigned-installer
+        uses: actions/upload-artifact@v7
         with:
-          name: VoxMate-unsigned-installer
-          path: artifacts/installer/*
+          path: artifacts/installer/VoxMate-Setup-${{ steps.app-version.outputs.version }}-win-x64.exe
+          archive: false
+          if-no-files-found: error
+          retention-days: 7
+      - name: Check SignPath configuration
+        if: ${{ inputs.sign_with_signpath }}
+        shell: pwsh
+        env:
+          SIGNPATH_API_TOKEN: ${{ secrets.SIGNPATH_API_TOKEN }}
+          SIGNPATH_ORGANIZATION_ID: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          SIGNPATH_PROJECT_SLUG: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          SIGNPATH_SIGNING_POLICY_SLUG: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}
+          SIGNPATH_ARTIFACT_CONFIGURATION_SLUG: ${{ vars.SIGNPATH_ARTIFACT_CONFIGURATION_SLUG }}
+        run: |
+          foreach ($name in @('SIGNPATH_API_TOKEN', 'SIGNPATH_ORGANIZATION_ID', 'SIGNPATH_PROJECT_SLUG', 'SIGNPATH_SIGNING_POLICY_SLUG', 'SIGNPATH_ARTIFACT_CONFIGURATION_SLUG')) {
+            if ([string]::IsNullOrWhiteSpace([Environment]::GetEnvironmentVariable($name))) {
+              throw "Missing SignPath secret or repository variable: $name"
+            }
+          }
+      - name: Submit SignPath signing request
+        if: ${{ inputs.sign_with_signpath }}
+        uses: signpath/github-action-submit-signing-request@v3
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}
+          artifact-configuration-slug: ${{ vars.SIGNPATH_ARTIFACT_CONFIGURATION_SLUG }}
+          github-artifact-id: ${{ steps.unsigned-installer.outputs.artifact-id }}
+          parameters: |
+            version: "${{ steps.app-version.outputs.version }}"
+          skip-decompress: true
+          wait-for-completion: true
+          wait-for-completion-timeout-in-seconds: 3600
+          output-artifact-directory: artifacts/signed
+      - name: Verify signed installer and write checksum
+        if: ${{ inputs.sign_with_signpath }}
+        shell: pwsh
+        run: |
+          $expectedName = 'VoxMate-Setup-${{ steps.app-version.outputs.version }}-win-x64.exe'
+          $signed = @(Get-ChildItem -LiteralPath artifacts/signed -Filter $expectedName -File -Recurse)
+          if ($signed.Count -ne 1) { throw "Expected one signed installer; found $($signed.Count)." }
+          $signature = Get-AuthenticodeSignature -LiteralPath $signed[0].FullName
+          if ($signature.Status -ne 'Valid' -or $signature.SignerCertificate.Subject -notmatch 'SignPath Foundation') {
+            throw "Unexpected signature status or publisher: $($signature.Status) / $($signature.SignerCertificate.Subject)"
+          }
+          if ($signed[0].VersionInfo.ProductName -ne 'VoxMate' -or $signed[0].VersionInfo.ProductVersion -ne '${{ steps.app-version.outputs.version }}') {
+            throw 'Signed installer version metadata does not match this build.'
+          }
+          $hash = (Get-FileHash -LiteralPath $signed[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+          Set-Content -LiteralPath (Join-Path $signed[0].DirectoryName "$($signed[0].BaseName).sha256") -Value "$hash  $($signed[0].Name)" -Encoding ascii
+      - name: Upload verified signed installer
+        if: ${{ inputs.sign_with_signpath }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: VoxMate-signed-installer
+          path: artifacts/signed/
           if-no-files-found: error
           retention-days: 7
