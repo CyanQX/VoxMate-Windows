@@ -1,6 +1,6 @@
 # SignPath Foundation 签名接入
 
-当前 [v0.1.0 安装器](https://github.com/CyanQX/VoxMate-Windows/releases/tag/v0.1.0) 未签名。只有 SignPath Foundation 批准项目、配置签名证书和项目后，才能通过本仓库的 GitHub Actions 生成带受信任签名的安装器。申请和审批结果由 SignPath 决定。
+当前 [v0.1.0 安装器](https://github.com/CyanQX/VoxMate-Windows/releases/tag/v0.1.0) 未签名。SignPath Foundation 的免费签名申请已提交，正在等待审核。只有 SignPath Foundation 批准项目、配置签名证书和项目后，才能通过本仓库的 GitHub Actions 生成带受信任签名的安装器。申请和审批结果由 SignPath 决定。
 
 ## 已准备的文件
 

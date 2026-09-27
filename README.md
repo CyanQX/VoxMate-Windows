@@ -1,6 +1,6 @@
 # VoxMate
 
-**许可证：** [MIT](LICENSE)。**Code signing policy：** [代码签名政策](docs/code-signing-policy.md)。当前提供的安装器尚未经过受信任的代码签名；项目计划申请 SignPath Foundation 的免费开源签名，能否获批取决于其审核。获批后的签名致谢措辞为 “Free code signing provided by SignPath.io, certificate by SignPath Foundation”。
+**许可证：** [MIT](LICENSE)。**Code signing policy：** [代码签名政策](docs/code-signing-policy.md)。当前提供的安装器尚未经过受信任的代码签名；项目已提交 SignPath Foundation 免费开源签名申请，正在等待审核，能否获批取决于其决定。获批后的签名致谢措辞为 “Free code signing provided by SignPath.io, certificate by SignPath Foundation”。
 
 [SignPath 签名接入说明](docs/signpath-setup.md)列出了获批后的构建和验证步骤；目前工作流默认只生成未签名安装器。
 
