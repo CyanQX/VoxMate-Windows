@@ -1,5 +1,5 @@
 #ifndef AppVersion
-  #define AppVersion "0.1.0"
+  #define AppVersion "0.1.1"
 #endif
 #ifndef PublishDir
   #define PublishDir "..\artifacts\publish\installer-input"
@@ -28,26 +28,43 @@ UninstallDisplayIcon={app}\VoiceTranslator.App.exe
 Compression=lzma2/max
 SolidCompression=yes
 OutputDir=..\artifacts\installer
+#ifdef ChineseEdition
+OutputBaseFilename=VoxMate-Setup-{#AppVersion}-win-x64-zh-CN
+#else
 OutputBaseFilename=VoxMate-Setup-{#AppVersion}-win-x64
+#endif
 CloseApplications=yes
 RestartApplications=no
 UsePreviousAppDir=yes
 
 [Languages]
+#ifdef ChineseEdition
 Name: "chinesesimp"; MessagesFile: "compiler:Languages\ChineseSimplified.isl"
+#else
 Name: "english"; MessagesFile: "compiler:Default.isl"
+#endif
 
 [CustomMessages]
+#ifdef ChineseEdition
 chinesesimp.DesktopIconTask=创建桌面快捷方式
-english.DesktopIconTask=Create a desktop shortcut
 chinesesimp.LaunchApp=运行 VoxMate
+#else
+english.DesktopIconTask=Create a desktop shortcut
 english.LaunchApp=Launch VoxMate
+#endif
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:DesktopIconTask}"; Flags: unchecked
 
 [Files]
-Source: "{#PublishDir}\*"; DestDir: "{app}"; Excludes: "*.pdb"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#PublishDir}\*"; DestDir: "{app}"; Excludes: "*.pdb,Locales\*"; Flags: ignoreversion recursesubdirs createallsubdirs
+#ifdef ChineseEdition
+Source: "..\localization\zh-CN\Locales\zh-CN.json"; DestDir: "{app}\Locales"; Flags: ignoreversion
+Source: "..\localization\zh-CN\Locales\active-locale.txt"; DestDir: "{app}\Locales"; Flags: ignoreversion
+#else
+[InstallDelete]
+Type: files; Name: "{app}\Locales\active-locale.txt"
+#endif
 
 [Icons]
 Name: "{autoprograms}\VoxMate"; Filename: "{app}\VoiceTranslator.App.exe"; WorkingDir: "{app}"

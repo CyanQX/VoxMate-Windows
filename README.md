@@ -1,12 +1,12 @@
 # VoxMate
 
-VoxMate is an offline voice transcription and translation assistant for Windows 11 x64. Click the microphone or press `Alt + Space` to start and stop recording. Choose Chinese, English, French, Japanese, or Russian as the recognition and translation languages, and swap the direction with one click. Local whisper.cpp and llama.cpp runtimes process speech and text. Both text cards are editable and copyable; you can also paste source text from the clipboard. Automatic translation and copying of the translation are enabled by default. VoxMate never pastes into another app or presses Enter automatically.
+VoxMate is an offline voice transcription and translation assistant for Windows 11 x64. Its default interface is English; an optional Simplified Chinese language pack and a separate Chinese installer are available from the source build. Click the microphone or press `Alt + Space` to start and stop recording. Choose Chinese, English, French, Japanese, or Russian as the recognition and translation languages, and swap the direction with one click. Local whisper.cpp and llama.cpp runtimes process speech and text. Both text cards are editable and copyable; you can also paste source text from the clipboard. Automatic translation and copying of the translation are enabled by default. VoxMate never pastes into another app or presses Enter automatically.
 
 **License:** [MIT](LICENSE). **Code signing policy:** [policy and maintainer roles](docs/code-signing-policy.md). The current installer is unsigned. An application for free SignPath Foundation open source code signing has been submitted and is awaiting review; approval is not guaranteed. If approved, the required acknowledgment will read “Free code signing provided by SignPath.io, certificate by SignPath Foundation.” The [SignPath integration guide](docs/signpath-setup.md) describes the build and verification steps after approval.
 
 The `main` branch contains buildable source code, UI assets, and documentation. EXE and DLL files, models, local downloads, and build outputs are excluded. GitHub Actions [verifies the source](.github/workflows/verify.yml) on every push. Maintainers trigger the [installer workflow](.github/workflows/package.yml) manually; its default output is a short-lived, unsigned Actions artifact and it does not publish a GitHub Release automatically.
 
-Download the Windows installer and its SHA-256 checksum from the [v0.1.0 Release](https://github.com/CyanQX/VoxMate-Windows/releases/tag/v0.1.0). This initial installer is unsigned. Check the checksum before running it, and see the [release notes](docs/release-notes-0.1.0.md) for details.
+The [v0.1.0 Release](https://github.com/CyanQX/VoxMate-Windows/releases/tag/v0.1.0) contains the previous unsigned installer, built before the English interface and Chinese language pack were added. The 0.1.1 English and Chinese installers can be built from this source. See the [0.1.1 release notes](docs/release-notes-0.1.1.md).
 
 ## Run from source
 
@@ -50,16 +50,18 @@ Online APIs, GPU inference, automatic end-of-speech detection, automatic pasting
 Download and verify the local runtimes and models as described above, then make the [Inno Setup 7](https://jrsoftware.org/isdl.php) compiler `ISCC.exe` available. The build script checks `.local/tools/InnoSetup7/ISCC.exe`, standard installation directories, and then `PATH`.
 
 ```powershell
-./build-installer.ps1
+./build-installer.ps1 -Both
 ```
 
 The script rebuilds, tests, and publishes the self-contained Windows x64 app with bundled models, then creates:
 
-- `artifacts/installer/VoxMate-Setup-0.1.0-win-x64.exe`: standalone installer for users.
-- `artifacts/installer/VoxMate-Setup-0.1.0-win-x64.sha256`: SHA-256 checksum for that installer.
+- `artifacts/installer/VoxMate-Setup-0.1.1-win-x64.exe`: English installer.
+- `artifacts/installer/VoxMate-Setup-0.1.1-win-x64-zh-CN.exe`: Simplified Chinese installer, including the Chinese language pack.
+- Matching `.sha256` checksum files for both installers.
+- `artifacts/language-packs/VoxMate-zh-CN-language-pack.zip`: portable Chinese interface pack.
 - `artifacts/installer/RELEASE_NOTES.md`: text suitable for a GitHub Release.
 
-The installer installs per user to `%LOCALAPPDATA%\Programs\VoxMate` without administrator rights. It includes the app icon, Start menu shortcut, optional desktop shortcut, and an uninstall entry. A newer installer uses the same application ID to upgrade an existing installation. Attach the EXE and `.sha256` file to a GitHub Release and use `RELEASE_NOTES.md` as its description. The current installer is unsigned, and the build process never runs or installs it. See the [privacy policy](docs/privacy.md) and [third-party license index](licenses/README.md).
+Each installer installs per user to `%LOCALAPPDATA%\Programs\VoxMate` without administrator rights. It includes the app icon, Start menu shortcut, optional desktop shortcut, and an uninstall entry. Both editions share one application ID and upgrade the same installation. The English installer clears the Chinese activation marker when switching editions; the Chinese installer adds the pack. Both builds are unsigned, and the build process never runs or installs them. To switch an English installation to Chinese without reinstalling, extract the ZIP directly into the VoxMate installation directory so the files appear under `Locales\`, then restart VoxMate. See the [language pack instructions](docs/localization.md), [privacy policy](docs/privacy.md), and [third-party license index](licenses/README.md).
 
 If an older app instance still uses the default publish directory, specify another directory with `-OutputDirectory`, exit the old app, and then start the new build.
 

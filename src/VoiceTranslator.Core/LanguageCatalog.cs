@@ -13,16 +13,16 @@ public static class LanguageCatalog
         "fr" => "French",
         "ja" => "Japanese",
         "ru" => "Russian",
-        _ => throw new ArgumentOutOfRangeException(nameof(code), $"不支持的语言：{code}")
+        _ => throw new ArgumentOutOfRangeException(nameof(code), $"Unsupported language: {code}")
     };
 
     public static string DisplayName(string code) => code.ToLowerInvariant() switch
     {
-        "zh" => "中文",
+        "zh" => "Chinese",
         "en" or "english" => "English",
-        "fr" => "Français",
-        "ja" => "日本語",
-        "ru" => "Русский",
+        "fr" => "French",
+        "ja" => "Japanese",
+        "ru" => "Russian",
         _ => code
     };
 }

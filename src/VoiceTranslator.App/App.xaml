@@ -7,7 +7,7 @@
         <SolidColorBrush x:Key="Accent" Color="#584BFF"/>
         <SolidColorBrush x:Key="Line" Color="#DDE3F0"/>
         <Style TargetType="TextBlock">
-            <Setter Property="FontFamily" Value="Microsoft YaHei UI"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="Foreground" Value="{StaticResource Ink}"/>
         </Style>
         <Style x:Key="IconText" TargetType="TextBlock">
@@ -20,7 +20,7 @@
             <Setter Property="BorderBrush" Value="{StaticResource Line}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Padding" Value="12,7"/>
-            <Setter Property="FontFamily" Value="Microsoft YaHei UI"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="12"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">

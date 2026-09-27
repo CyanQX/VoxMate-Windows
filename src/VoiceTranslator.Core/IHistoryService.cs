@@ -8,11 +8,11 @@ public sealed record HistoryEntry(Guid Id, DateTimeOffset CreatedAt, string Sour
     public string ModeLabel => Mode switch
     {
         TranslationMode.AiPrompt => "AI Prompt",
-        TranslationMode.Technical => "技术开发",
-        TranslationMode.Academic => "学术翻译",
-        TranslationMode.Business => "商务翻译",
-        TranslationMode.Custom => "自定义模式",
-        _ => "直接翻译"
+        TranslationMode.Technical => "Technical",
+        TranslationMode.Academic => "Academic",
+        TranslationMode.Business => "Business",
+        TranslationMode.Custom => "Custom",
+        _ => "Direct"
     };
 }
 

@@ -8,13 +8,13 @@ public sealed class LlamaCliTranslationProvider : ITranslationProvider
 {
     public async Task<TranslationResult> TranslateAsync(TranslationRequest request, AppSettings settings, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(request.SourceText)) throw new ArgumentException("原文为空。", nameof(request));
+        if (string.IsNullOrWhiteSpace(request.SourceText)) throw new ArgumentException("Source text is empty.", nameof(request));
         if (!File.Exists(settings.LlamaExecutablePath) || !File.Exists(settings.LlamaModelPath))
-            throw new FileNotFoundException("缺少本地翻译运行时或模型。请先运行 setup-translation.ps1，或在翻译设置中选择文件。");
+            throw new FileNotFoundException("The local translation runtime or model is missing. Run setup-translation.ps1 or choose the files in Translation Settings.");
 
         string sourceLanguage = LanguageCatalog.EnglishName(request.SourceLanguage);
         string targetLanguage = LanguageCatalog.EnglishName(request.TargetLanguage);
-        if (sourceLanguage == targetLanguage) throw new ArgumentException("原文语言和目标语言不能相同。", nameof(request));
+        if (sourceLanguage == targetLanguage) throw new ArgumentException("Source and target languages must differ.", nameof(request));
 
         string instruction = request.Mode switch
         {
@@ -54,7 +54,7 @@ public sealed class LlamaCliTranslationProvider : ITranslationProvider
         try
         {
             using var process = new Process { StartInfo = start };
-            if (!process.Start()) throw new InvalidOperationException("无法启动本地翻译程序。");
+            if (!process.Start()) throw new InvalidOperationException("Could not start the local translator.");
             using var registration = cancellationToken.Register(() => { try { if (!process.HasExited) process.Kill(true); } catch (InvalidOperationException) { } });
             Task<string> outputTask = process.StandardOutput.ReadToEndAsync(cancellationToken);
             Task<string> errorTask = process.StandardError.ReadToEndAsync(cancellationToken);
@@ -63,13 +63,13 @@ public sealed class LlamaCliTranslationProvider : ITranslationProvider
             string error = await errorTask;
             cancellationToken.ThrowIfCancellationRequested();
             if (process.ExitCode != 0)
-                throw new InvalidOperationException($"本地翻译失败：{error.Trim().Split('\n').LastOrDefault()?.Trim() ?? "未知错误"}");
+                throw new InvalidOperationException($"Local translation failed: {error.Trim().Split('\n').LastOrDefault()?.Trim() ?? "unknown error"}");
             string transcript = (await File.ReadAllTextAsync(outputPath, Encoding.UTF8, cancellationToken)).Replace("\r\n", "\n", StringComparison.Ordinal);
             const string marker = "\nAssistant:\n";
             int markerIndex = transcript.LastIndexOf(marker, StringComparison.Ordinal);
-            if (markerIndex < 0) throw new InvalidOperationException("本地模型输出格式异常，请重新翻译。");
+            if (markerIndex < 0) throw new InvalidOperationException("The local model returned an unexpected format. Translate again.");
             string translated = transcript[(markerIndex + marker.Length)..].Trim();
-            if (string.IsNullOrWhiteSpace(translated)) throw new InvalidOperationException("本地模型没有返回译文。");
+            if (string.IsNullOrWhiteSpace(translated)) throw new InvalidOperationException("The local model returned no translation.");
             return new TranslationResult(translated, "llama.cpp / Qwen2.5");
         }
         finally

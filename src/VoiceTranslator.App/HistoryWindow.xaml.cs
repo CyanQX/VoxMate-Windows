@@ -30,8 +30,8 @@ public partial class HistoryWindow : Window
             .OrderByDescending(item => item.CreatedAt).ToList();
         EntriesList.ItemsSource = entries;
         NoticeText.Text = !_viewModel.SaveHistory
-            ? "历史保存已关闭。可在基础设置中启用；已有记录仍可查看和删除。"
-            : entries.Count == 0 ? "暂无符合条件的记录。" : $"共 {entries.Count} 条记录，仅保存在本机。";
+            ? Localization.T("History is off. Enable it in Basic Settings; existing entries can still be viewed and deleted.")
+            : entries.Count == 0 ? Localization.T("No matching entries.") : Localization.T("{0} entries, stored only on this device.", entries.Count);
     }
 
     private void Copy_Click(object sender, RoutedEventArgs e)
@@ -47,7 +47,7 @@ public partial class HistoryWindow : Window
     private void Clear_Click(object sender, RoutedEventArgs e)
     {
         if (_viewModel.History.Load().Count == 0) return;
-        if (MessageBox.Show(this, "确定清空所有本机历史记录？", "清空历史记录", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
+        if (MessageBox.Show(this, Localization.T("Clear all local history entries?"), Localization.T("Clear history"), MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
         _viewModel.History.Clear();
         Reload();
     }

@@ -16,7 +16,8 @@ internal static class ChineseTextNormalizer
         var output = new StringBuilder(length);
         int written = LCMapStringEx("zh-CN", SimplifiedChinese, text, text.Length,
             output, output.Capacity, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero);
-        return written > 0 ? output.ToString(0, written).Replace('麽', '么') : text;
+        // Normalize this variant character after Windows maps text to Simplified Chinese.
+        return written > 0 ? output.ToString(0, written).Replace('\u9EBD', '\u4E48') : text;
     }
 
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]

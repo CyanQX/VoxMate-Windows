@@ -70,11 +70,11 @@ public sealed class MainViewModel : INotifyPropertyChanged
     public RelayCommand SwapLanguagesCommand { get; }
     public IReadOnlyList<LanguageChoice> AvailableLanguages { get; } =
     [
-        new("zh", "中文（普通话）", "中文", "cn"),
-        new("en", "English（英语）", "English", "us"),
-        new("fr", "Français（法语）", "Français", "fr"),
-        new("ja", "日本語（日语）", "日本語", "jp"),
-        new("ru", "Русский（俄语）", "Русский", "ru")
+        new("zh", Localization.T("Chinese (Mandarin)"), Localization.T("Chinese"), "cn"),
+        new("en", Localization.T("English"), Localization.T("English"), "us"),
+        new("fr", Localization.T("French"), Localization.T("French"), "fr"),
+        new("ja", Localization.T("Japanese"), Localization.T("Japanese"), "jp"),
+        new("ru", Localization.T("Russian"), Localization.T("Russian"), "ru")
     ];
 
     public AssistantState State
@@ -100,47 +100,47 @@ public sealed class MainViewModel : INotifyPropertyChanged
         }
     }
 
-    public string StatusText => State switch
+    public string StatusText => Localization.T(State switch
     {
-        AssistantState.Starting => "正在连接麦克风...",
-        AssistantState.Recording => "正在录音...",
-        AssistantState.ProcessingAudio => "正在处理音频...",
-        AssistantState.Recognizing => "正在识别语音...",
-        AssistantState.SourceReady => "识别完成",
-        AssistantState.Translating => "正在翻译...",
-        AssistantState.Completed => "已完成，可复制",
-        AssistantState.Error => "出现问题",
-        _ => "空闲"
-    };
-    public string RecordingButtonText => State == AssistantState.Starting ? "正在启动麦克风..." : IsRecording ? "再次点击或按 Alt + Space 结束" :
-        HotkeyRegistered ? "点击开始录音  或按 Alt + Space 说话" : "点击开始录音";
+        AssistantState.Starting => "Connecting to microphone...",
+        AssistantState.Recording => "Recording...",
+        AssistantState.ProcessingAudio => "Processing audio...",
+        AssistantState.Recognizing => "Recognizing speech...",
+        AssistantState.SourceReady => "Recognition complete",
+        AssistantState.Translating => "Translating...",
+        AssistantState.Completed => "Done, ready to copy",
+        AssistantState.Error => "Something went wrong",
+        _ => "Idle"
+    });
+    public string RecordingButtonText => Localization.T(State == AssistantState.Starting ? "Starting microphone..." : IsRecording ? "Click again or press Alt + Space to stop" :
+        HotkeyRegistered ? "Click to record or press Alt + Space to speak" : "Click to record");
     public bool HotkeyRegistered
     {
         get => _hotkeyRegistered;
         set { _hotkeyRegistered = value; OnPropertyChanged(); OnPropertyChanged(nameof(RecordingButtonText)); OnPropertyChanged(nameof(MiniStatusHint)); }
     }
-    public string MiniStatusText => State switch
+    public string MiniStatusText => Localization.T(State switch
     {
-        AssistantState.Starting => "正在连接麦克风...",
-        AssistantState.Recording => "正在录音...",
-        AssistantState.ProcessingAudio => "正在处理音频...",
-        AssistantState.Recognizing => "正在识别语音...",
-        AssistantState.SourceReady => "已完成，可复制",
-        AssistantState.Translating => "正在翻译...",
-        AssistantState.Completed => "已完成，可复制",
-        AssistantState.Error => "处理失败",
-        _ => "准备就绪"
-    };
-    public string MiniStatusHint => State switch
+        AssistantState.Starting => "Connecting...",
+        AssistantState.Recording => "Recording...",
+        AssistantState.ProcessingAudio => "Processing audio...",
+        AssistantState.Recognizing => "Recognizing speech...",
+        AssistantState.SourceReady => "Ready to copy",
+        AssistantState.Translating => "Translating...",
+        AssistantState.Completed => "Ready to copy",
+        AssistantState.Error => "Processing failed",
+        _ => "Ready"
+    });
+    public string MiniStatusHint => Localization.T(State switch
     {
-        AssistantState.Starting => "设备启动中，请稍候",
-        AssistantState.Recording => "再次点击麦克风结束",
-        AssistantState.Recognizing => "请稍候，本地识别中",
-        AssistantState.SourceReady => "识别结果已生成",
-        AssistantState.Translating => "本地模型正在生成译文",
-        AssistantState.Completed => AutoCopyTranslation ? "译文已复制，按 Ctrl + V 粘贴" : "点击复制译文",
-        _ => HotkeyRegistered ? "点击麦克风或按 Alt + Space 开始" : "点击麦克风开始"
-    };
+        AssistantState.Starting => "Starting device, please wait",
+        AssistantState.Recording => "Click the microphone again to stop",
+        AssistantState.Recognizing => "Recognizing locally, please wait",
+        AssistantState.SourceReady => "Transcript is ready",
+        AssistantState.Translating => "Local model is translating",
+        AssistantState.Completed => AutoCopyTranslation ? "Translation copied; press Ctrl + V to paste" : "Click to copy the translation",
+        _ => HotkeyRegistered ? "Click the microphone or press Alt + Space" : "Click the microphone to start"
+    });
     public bool IsRecording => State == AssistantState.Recording;
     public bool IsBusy => State is AssistantState.Starting or AssistantState.ProcessingAudio or AssistantState.Recognizing or AssistantState.Translating;
     public bool CanChangeLanguages => State is not AssistantState.Starting and not AssistantState.Recording and not AssistantState.ProcessingAudio and not AssistantState.Recognizing and not AssistantState.Translating;
@@ -165,10 +165,10 @@ public sealed class MainViewModel : INotifyPropertyChanged
         }
     }
 
-    public string SourceResultHeader => $"{_sourceLanguage.ShortName}（已识别）";
-    public string TranslationResultHeader => $"{_targetLanguage.ShortName}（翻译结果）";
+    public string SourceResultHeader => Localization.T("{0} (recognized)", _sourceLanguage.ShortName);
+    public string TranslationResultHeader => Localization.T("{0} (translation)", _targetLanguage.ShortName);
     public string LanguagePairLabel => $"{_sourceLanguage.ShortName}  →  {_targetLanguage.ShortName}";
-    public string PinButtonTooltip => AlwaysOnTop ? "取消置顶" : "始终置顶";
+    public string PinButtonTooltip => Localization.T(AlwaysOnTop ? "Turn off always on top" : "Always on top");
 
     private void SetLanguagePair(LanguageChoice source, LanguageChoice target, bool exchangeContent)
     {
@@ -230,7 +230,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
         }
     }
     public int SourceCount => SourceText.Length;
-    public string MiniSourcePreview => string.IsNullOrWhiteSpace(SourceText) ? $"{_sourceLanguage.ShortName}识别结果会显示在这里" : SourceText;
+    public string MiniSourcePreview => string.IsNullOrWhiteSpace(SourceText) ? Localization.T("{0} transcript appears here", _sourceLanguage.ShortName) : SourceText;
     public string TranslationText
     {
         get => _translationText;
@@ -245,7 +245,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
         }
     }
     public int TranslationCount => TranslationText.Length;
-    public string MiniTranslationPreview => string.IsNullOrWhiteSpace(TranslationText) ? $"{_targetLanguage.ShortName}译文会显示在这里" : TranslationText;
+    public string MiniTranslationPreview => string.IsNullOrWhiteSpace(TranslationText) ? Localization.T("{0} translation appears here", _targetLanguage.ShortName) : TranslationText;
     public string SuccessText
     {
         get => _successText;
@@ -317,15 +317,15 @@ public sealed class MainViewModel : INotifyPropertyChanged
             if (!IsBusy && !string.IsNullOrWhiteSpace(SourceText)) State = AssistantState.SourceReady;
         }
     }
-    public string TranslationModeLabel => SelectedTranslationMode switch
+    public string TranslationModeLabel => Localization.T(SelectedTranslationMode switch
     {
         TranslationMode.AiPrompt => "AI Prompt",
-        TranslationMode.Technical => "技术开发",
-        TranslationMode.Academic => "学术翻译",
-        TranslationMode.Business => "商务翻译",
-        TranslationMode.Custom => "自定义模式",
-        _ => "直接翻译"
-    };
+        TranslationMode.Technical => "Technical",
+        TranslationMode.Academic => "Academic",
+        TranslationMode.Business => "Business",
+        TranslationMode.Custom => "Custom",
+        _ => "Direct"
+    });
     public string ErrorText
     {
         get => _errorText;
@@ -390,12 +390,12 @@ public sealed class MainViewModel : INotifyPropertyChanged
         {
             foreach (var device in _recorder.GetInputDevices()) Devices.Add(device);
             SelectedDevice = Devices.FirstOrDefault(d => d.Index == _settings.MicrophoneIndex) ?? Devices.FirstOrDefault();
-            if (Devices.Count == 0) ErrorText = "未检测到麦克风。请连接麦克风后点击刷新。";
+            if (Devices.Count == 0) ErrorText = Localization.T("No microphone detected. Connect one and click Refresh.");
             else ErrorText = string.Empty;
         }
         catch (Exception ex)
         {
-            ErrorText = $"读取麦克风列表失败：{ex.Message}";
+            ErrorText = Localization.T("Could not load microphones: {0}", Localization.T(ex.Message));
         }
     }
 
@@ -410,12 +410,12 @@ public sealed class MainViewModel : INotifyPropertyChanged
         }
         if (IsBusy || SelectedDevice is null)
         {
-            ErrorText = SelectedDevice is null ? "请先连接并选择麦克风。" : "请等待当前识别结束。";
+            ErrorText = Localization.T(SelectedDevice is null ? "Connect and select a microphone first." : "Wait for recognition to finish.");
             return;
         }
         if (!File.Exists(WhisperExecutablePath) || !File.Exists(WhisperModelPath))
         {
-            ErrorText = "缺少 whisper.cpp 程序或多语言模型。请先运行 setup-whisper.ps1，或在语音识别设置中选择文件。";
+            ErrorText = Localization.T("The whisper.cpp executable or multilingual model is missing. Run setup-whisper.ps1 or choose the files in Speech Recognition Settings.");
             State = AssistantState.Error;
             return;
         }
@@ -429,7 +429,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
         }
         catch (Exception ex)
         {
-            ErrorText = $"开始录音失败：{ex.Message}";
+            ErrorText = Localization.T("Could not start recording: {0}", Localization.T(ex.Message));
             State = AssistantState.Error;
         }
     }
@@ -454,7 +454,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
         }
         catch (Exception ex)
         {
-            ErrorText = ex is OperationCanceledException ? "识别超时，请缩短录音后重试。" : ex.Message;
+            ErrorText = ex is OperationCanceledException ? Localization.T("Recognition timed out. Try a shorter recording.") : Localization.T(ex.Message);
             State = AssistantState.Error;
         }
         finally
@@ -487,7 +487,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
             var result = await (Task<TranslationResult>)_activeTranslationTask;
             if (SourceText != sourceSnapshot || TranslationText != previousTranslation || SelectedTranslationMode != modeSnapshot)
             {
-                ErrorText = "翻译期间原文或模式已修改，请再次点击翻译。";
+                ErrorText = Localization.T("The source text or mode changed during translation. Click Translate again.");
                 State = AssistantState.SourceReady;
                 return;
             }
@@ -503,26 +503,26 @@ public sealed class MainViewModel : INotifyPropertyChanged
                         TargetLanguageCode = targetLanguageSnapshot
                     });
                 }
-                catch (Exception ex) { ErrorText = $"译文已生成，但保存历史失败：{ex.Message}"; }
+                catch (Exception ex) { ErrorText = Localization.T("Translation completed, but history could not be saved: {0}", Localization.T(ex.Message)); }
             }
             if (AutoCopyTranslation)
             {
                 try
                 {
                     Clipboard.SetText(TranslationText);
-                    SuccessText = "译文已复制到剪贴板。按 Ctrl + V 粘贴到当前输入框。";
+                    SuccessText = Localization.T("Translation copied. Press Ctrl + V to paste it into the current field.");
                 }
                 catch (Exception ex)
                 {
-                    ErrorText = $"译文已生成，但自动复制失败：{ex.Message}";
-                    SuccessText = "翻译完成，可手动复制译文。";
+                    ErrorText = Localization.T("Translation completed, but automatic copying failed: {0}", Localization.T(ex.Message));
+                    SuccessText = Localization.T("Translation completed. You can copy it manually.");
                 }
             }
-            else SuccessText = "翻译完成，可编辑或复制译文。";
+            else SuccessText = Localization.T("Translation completed. You can edit or copy it.");
         }
         catch (Exception ex)
         {
-            ErrorText = ex is OperationCanceledException ? "翻译超时或已取消。" : ex.Message;
+            ErrorText = ex is OperationCanceledException ? Localization.T("Translation timed out or was canceled.") : Localization.T(ex.Message);
             State = AssistantState.Error;
         }
         finally
@@ -535,29 +535,29 @@ public sealed class MainViewModel : INotifyPropertyChanged
 
     private void CopyTranslation()
     {
-        try { Clipboard.SetText(TranslationText); ErrorText = string.Empty; SuccessText = "译文已复制到剪贴板。按 Ctrl + V 粘贴到当前输入框。"; }
-        catch (Exception ex) { ErrorText = $"复制失败：{ex.Message}"; }
+        try { Clipboard.SetText(TranslationText); ErrorText = string.Empty; SuccessText = Localization.T("Translation copied. Press Ctrl + V to paste it into the current field."); }
+        catch (Exception ex) { ErrorText = Localization.T("Copy failed: {0}", Localization.T(ex.Message)); }
     }
 
     private void CopySource()
     {
-        try { Clipboard.SetText(SourceText); ErrorText = string.Empty; SuccessText = "识别结果已复制到剪贴板。"; }
-        catch (Exception ex) { ErrorText = $"复制失败：{ex.Message}"; }
+        try { Clipboard.SetText(SourceText); ErrorText = string.Empty; SuccessText = Localization.T("Transcript copied to the clipboard."); }
+        catch (Exception ex) { ErrorText = Localization.T("Copy failed: {0}", Localization.T(ex.Message)); }
     }
 
     private void PasteSource()
     {
         try
         {
-            if (!Clipboard.ContainsText()) { ErrorText = "剪贴板中没有可粘贴的文本。"; return; }
+            if (!Clipboard.ContainsText()) { ErrorText = Localization.T("The clipboard has no text to paste."); return; }
             string text = Clipboard.GetText();
-            if (string.IsNullOrWhiteSpace(text)) { ErrorText = "剪贴板中的文本为空。"; return; }
-            if (text.Length > 5000) { ErrorText = "剪贴板文本超过 5000 字，请先缩短后粘贴。"; return; }
+            if (string.IsNullOrWhiteSpace(text)) { ErrorText = Localization.T("The clipboard text is empty."); return; }
+            if (text.Length > 5000) { ErrorText = Localization.T("Clipboard text exceeds 5,000 characters. Shorten it before pasting."); return; }
             SourceText = text;
             ErrorText = string.Empty;
             if (AutoTranslate) TranslateCommand.Execute(null);
         }
-        catch (Exception ex) { ErrorText = $"粘贴失败：{ex.Message}"; }
+        catch (Exception ex) { ErrorText = Localization.T("Paste failed: {0}", Localization.T(ex.Message)); }
     }
 
     private void Clear()

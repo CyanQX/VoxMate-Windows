@@ -13,15 +13,15 @@ public sealed class WhisperCliRecognitionService : ISpeechRecognitionService
         string languageCode,
         CancellationToken cancellationToken)
     {
-        if (!File.Exists(audioPath)) throw new FileNotFoundException("录音文件不存在。", audioPath);
+        if (!File.Exists(audioPath)) throw new FileNotFoundException("The recording file does not exist.", audioPath);
         if (!File.Exists(executablePath))
-            throw new FileNotFoundException("找不到 whisper-cli.exe，请在语音识别设置中选择它。", executablePath);
+            throw new FileNotFoundException("whisper-cli.exe was not found. Select it in Speech Recognition Settings.", executablePath);
         if (!File.Exists(modelPath))
-            throw new FileNotFoundException("找不到多语言 Whisper 模型，请在语音识别设置中选择它。", modelPath);
+            throw new FileNotFoundException("The multilingual Whisper model was not found. Select it in Speech Recognition Settings.", modelPath);
         if (!LanguageCatalog.IsSupported(languageCode))
-            throw new ArgumentOutOfRangeException(nameof(languageCode), "不支持的识别语言。");
+            throw new ArgumentOutOfRangeException(nameof(languageCode), "Unsupported recognition language.");
         if (languageCode != "en" && Path.GetFileName(modelPath).Contains(".en.", StringComparison.OrdinalIgnoreCase))
-            throw new InvalidOperationException("英文专用模型无法识别所选语言，请选择多语言模型。");
+            throw new InvalidOperationException("The English-only model cannot recognize the selected language. Choose a multilingual model.");
 
         string outputPrefix = Path.Combine(Path.GetTempPath(), "VoiceTranslator", $"transcript-{Guid.NewGuid():N}");
         Directory.CreateDirectory(Path.GetDirectoryName(outputPrefix)!);
@@ -41,7 +41,7 @@ public sealed class WhisperCliRecognitionService : ISpeechRecognitionService
         using var process = new Process { StartInfo = startInfo };
         try
         {
-            if (!process.Start()) throw new InvalidOperationException("无法启动 whisper.cpp。");
+            if (!process.Start()) throw new InvalidOperationException("Could not start whisper.cpp.");
             Task<string> stdout = process.StandardOutput.ReadToEndAsync(cancellationToken);
             Task<string> stderr = process.StandardError.ReadToEndAsync(cancellationToken);
             try
@@ -56,12 +56,12 @@ public sealed class WhisperCliRecognitionService : ISpeechRecognitionService
             }
             string diagnostic = await stderr;
             if (process.ExitCode != 0)
-                throw new InvalidOperationException($"whisper.cpp 识别失败（退出码 {process.ExitCode}）：{diagnostic.Trim()}");
+                throw new InvalidOperationException($"whisper.cpp recognition failed (exit code {process.ExitCode}): {diagnostic.Trim()}");
             string text = File.Exists(transcriptPath)
                 ? (await File.ReadAllTextAsync(transcriptPath, Encoding.UTF8, cancellationToken)).Trim()
                 : (await stdout).Trim();
             if (string.IsNullOrWhiteSpace(text))
-                throw new InvalidOperationException("识别结果为空，请靠近麦克风后重试。");
+                throw new InvalidOperationException("The transcript is empty. Move closer to the microphone and try again.");
             return languageCode == "zh" ? ChineseTextNormalizer.ToSimplified(text) : text;
         }
         finally

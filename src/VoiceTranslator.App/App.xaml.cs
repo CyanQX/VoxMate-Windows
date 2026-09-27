@@ -33,25 +33,25 @@ public partial class App : System.Windows.Application
         mainWindow.Show();
         var menu = new Forms.ContextMenuStrip();
         void Add(string label, Action action) => menu.Items.Add(label, null, (_, _) => Dispatcher.InvokeAsync(action));
-        Add("显示主窗口", mainWindow.ShowMain);
-        Add("迷你模式", mainWindow.EnterMiniMode);
+        Add(Localization.T("Show main window"), mainWindow.ShowMain);
+        Add(Localization.T("Mini mode"), mainWindow.EnterMiniMode);
         menu.Items.Add(new Forms.ToolStripSeparator());
-        Add("开始／停止录音", () => viewModel.ToggleRecordingCommand.Execute(null));
-        Add("暂停监听", () => { if (viewModel.IsRecording) viewModel.ToggleRecordingCommand.Execute(null); });
+        Add(Localization.T("Start / stop recording"), () => viewModel.ToggleRecordingCommand.Execute(null));
+        Add(Localization.T("Stop listening"), () => { if (viewModel.IsRecording) viewModel.ToggleRecordingCommand.Execute(null); });
         menu.Items.Add(new Forms.ToolStripSeparator());
-        Add("设置...", () => { mainWindow.ShowMain(); mainWindow.OpenSettings(); });
-        Add("历史记录...", () => { mainWindow.ShowMain(); mainWindow.OpenHistory(); });
-        Add("检查更新...", () => MessageBox.Show(mainWindow, "当前版本尚未配置更新通道。", "检查更新", MessageBoxButton.OK, MessageBoxImage.Information));
-        Add("关于...", () => MessageBox.Show(mainWindow, "VoxMate · Windows 本地语音翻译助手", "关于", MessageBoxButton.OK, MessageBoxImage.Information));
+        Add(Localization.T("Settings..."), () => { mainWindow.ShowMain(); mainWindow.OpenSettings(); });
+        Add(Localization.T("History..."), () => { mainWindow.ShowMain(); mainWindow.OpenHistory(); });
+        Add(Localization.T("Check for updates..."), () => MessageBox.Show(mainWindow, Localization.T("No update channel is configured for this release."), Localization.T("Check for updates"), MessageBoxButton.OK, MessageBoxImage.Information));
+        Add(Localization.T("About..."), () => MessageBox.Show(mainWindow, Localization.T("VoxMate · Offline voice translator for Windows"), Localization.T("About"), MessageBoxButton.OK, MessageBoxImage.Information));
         menu.Items.Add(new Forms.ToolStripSeparator());
-        Add("退出", mainWindow.RequestExit);
+        Add(Localization.T("Exit"), mainWindow.RequestExit);
         using (var iconStream = GetResourceStream(new Uri("pack://application:,,,/Assets/voxmate.ico"))?.Stream
-            ?? throw new InvalidOperationException("应用图标资源缺失。"))
+            ?? throw new InvalidOperationException("The application icon resource is missing."))
             _trayIcon = new Drawing.Icon(iconStream);
         _tray = new Forms.NotifyIcon
         {
             Icon = _trayIcon,
-            Text = "VoxMate · 准备就绪",
+            Text = Localization.T("VoxMate · Ready"),
             ContextMenuStrip = menu,
             Visible = true
         };
@@ -59,7 +59,7 @@ public partial class App : System.Windows.Application
         viewModel.PropertyChanged += (_, args) =>
         {
             if (args.PropertyName == nameof(MainViewModel.State) && _tray is not null)
-                _tray.Text = viewModel.IsRecording ? "VoxMate · 正在录音" : "VoxMate · " + viewModel.MiniStatusText;
+                _tray.Text = viewModel.IsRecording ? Localization.T("VoxMate · Recording") : "VoxMate · " + viewModel.MiniStatusText;
         };
     }
 

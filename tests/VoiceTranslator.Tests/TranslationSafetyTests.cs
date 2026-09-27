@@ -28,7 +28,7 @@ public sealed class TranslationSafetyTests
     {
         var provider = new LlamaCliTranslationProvider();
         var error = await Assert.ThrowsAsync<FileNotFoundException>(() => provider.TranslateAsync(
-            new TranslationRequest("你好", "English", TranslationMode.Direct),
+            new TranslationRequest("\u4F60\u597D", "English", TranslationMode.Direct),
             new AppSettings { LlamaExecutablePath = "missing-llama-cli.exe", LlamaModelPath = "missing.gguf" },
             CancellationToken.None));
         Assert.Contains("setup-translation.ps1", error.Message);

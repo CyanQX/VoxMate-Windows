@@ -30,13 +30,13 @@ public sealed class NAudioRecorder : IAudioRecorder
     {
         cancellationToken.ThrowIfCancellationRequested();
         if (deviceIndex < 0 || deviceIndex >= WaveIn.DeviceCount)
-            throw new InvalidOperationException("选定的麦克风已不可用，请重新选择。");
+            throw new InvalidOperationException("The selected microphone is unavailable. Select another device.");
 
         Task<Session> start;
         lock (_gate)
         {
-            if (_active is not null) throw new InvalidOperationException("录音已经开始。");
-            if (_pendingStart is not null) throw new InvalidOperationException("麦克风仍在启动，请稍后重试或重新选择设备。");
+            if (_active is not null) throw new InvalidOperationException("Recording has already started.");
+            if (_pendingStart is not null) throw new InvalidOperationException("The microphone is still starting. Try again shortly or select another device.");
             start = Task.Run(() => OpenSession(deviceIndex), CancellationToken.None);
             _pendingStart = start;
         }
@@ -47,7 +47,7 @@ public sealed class NAudioRecorder : IAudioRecorder
             cancellationToken.ThrowIfCancellationRequested();
             lock (_gate)
             {
-                if (!ReferenceEquals(_pendingStart, start)) throw new OperationCanceledException("录音启动已取消。");
+                if (!ReferenceEquals(_pendingStart, start)) throw new OperationCanceledException("Recording startup was canceled.");
                 _active = session;
                 _pendingStart = null;
             }
@@ -82,7 +82,7 @@ public sealed class NAudioRecorder : IAudioRecorder
                 }, CancellationToken.None, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
             }
             if (ex is TimeoutException)
-                throw new TimeoutException("麦克风启动超时。请检查系统麦克风权限或切换录音设备。", ex);
+                throw new TimeoutException("Microphone startup timed out. Check microphone permissions or select another device.", ex);
             throw;
         }
     }
@@ -92,7 +92,7 @@ public sealed class NAudioRecorder : IAudioRecorder
         Session session;
         lock (_gate)
         {
-            session = _active ?? throw new InvalidOperationException("当前没有录音。");
+            session = _active ?? throw new InvalidOperationException("No recording is in progress.");
             _active = null;
         }
         bool completed = false;
@@ -101,7 +101,7 @@ public sealed class NAudioRecorder : IAudioRecorder
             await Task.Run(session.Capture.StopRecording, cancellationToken).WaitAsync(StopTimeout, cancellationToken);
             await session.Stopped.Task.WaitAsync(StopTimeout, cancellationToken);
             if (!File.Exists(session.Path) || new FileInfo(session.Path).Length <= 44)
-                throw new InvalidOperationException("没有录到音频，请检查麦克风后重试。");
+                throw new InvalidOperationException("No audio was captured. Check the microphone and try again.");
             completed = true;
             return session.Path;
         }

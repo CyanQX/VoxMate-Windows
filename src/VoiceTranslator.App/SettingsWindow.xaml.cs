@@ -52,22 +52,22 @@ public partial class SettingsWindow : Window
     private void RefreshDevices_Click(object sender, RoutedEventArgs e) => _viewModel.RefreshDevices();
     private void BrowseExecutable_Click(object sender, RoutedEventArgs e)
     {
-        var dialog = new OpenFileDialog { Filter = "whisper-cli.exe|whisper-cli.exe|可执行文件|*.exe" };
+        var dialog = new OpenFileDialog { Filter = "whisper-cli.exe|whisper-cli.exe|Executable files|*.exe" };
         if (dialog.ShowDialog(this) == true) _viewModel.WhisperExecutablePath = dialog.FileName;
     }
     private void BrowseModel_Click(object sender, RoutedEventArgs e)
     {
-        var dialog = new OpenFileDialog { Filter = "Whisper GGML 模型|ggml-*.bin|模型文件|*.bin" };
+        var dialog = new OpenFileDialog { Filter = "Whisper GGML models|ggml-*.bin|Model files|*.bin" };
         if (dialog.ShowDialog(this) == true) _viewModel.WhisperModelPath = dialog.FileName;
     }
     private void BrowseLlamaExecutable_Click(object sender, RoutedEventArgs e)
     {
-        var dialog = new OpenFileDialog { Filter = "llama-cli.exe|llama-cli.exe|可执行文件|*.exe" };
+        var dialog = new OpenFileDialog { Filter = "llama-cli.exe|llama-cli.exe|Executable files|*.exe" };
         if (dialog.ShowDialog(this) == true) _viewModel.LlamaExecutablePath = dialog.FileName;
     }
     private void BrowseLlamaModel_Click(object sender, RoutedEventArgs e)
     {
-        var dialog = new OpenFileDialog { Filter = "GGUF 模型|*.gguf" };
+        var dialog = new OpenFileDialog { Filter = "GGUF models|*.gguf" };
         if (dialog.ShowDialog(this) == true) _viewModel.LlamaModelPath = dialog.FileName;
     }
     private void OpenModelsFolder_Click(object sender, RoutedEventArgs e)
