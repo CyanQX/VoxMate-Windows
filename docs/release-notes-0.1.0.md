@@ -28,4 +28,4 @@ Get-FileHash -Algorithm SHA256 .\VoxMate-Setup-0.1.0-win-x64.exe
 
 VoxMate 项目源码采用 MIT 许可证，见随包 `LICENSE`。当前安装器尚未获得受信任的代码签名；项目计划申请 SignPath Foundation 的免费开源签名服务，申请获批前不得将安装器描述为已签名。签名政策见随包 `docs/code-signing-policy.md`。
 
-源码与构建说明见仓库 `README.md`。本次发布只生成安装器，未在本机运行安装程序。
+源码与构建说明见仓库 `README.md`。安装器未在构建电脑上运行或安装；本次发布提供未经代码签名的初始版本，供用户自行核对来源及 SHA-256。
