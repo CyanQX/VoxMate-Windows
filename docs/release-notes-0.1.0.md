@@ -26,6 +26,6 @@ Get-FileHash -Algorithm SHA256 .\VoxMate-Setup-0.1.0-win-x64.exe
 
 本版本使用轻量本地翻译模型，法语、日语、俄语等方向可能出现译法不自然的情况。在线翻译 API、GPU 推理、自动粘贴和自动更新尚未接入。默认离线识别及翻译的本地数据处理、设置与历史记录位置见随包 `docs/privacy.md`。第三方许可见随包 `licenses/README.md`。
 
-VoxMate 项目源码采用 MIT 许可证，见随包 `LICENSE`。当前安装器尚未获得受信任的代码签名；项目计划申请 SignPath Foundation 的免费开源签名服务，申请获批前不得将安装器描述为已签名。签名政策见随包 `docs/code-signing-policy.md`。
+VoxMate 项目源码采用 MIT 许可证，见随包 `LICENSE`。当前安装器尚未获得受信任的代码签名；项目计划申请 SignPath Foundation 的免费开源签名服务，申请获批前不得将安装器描述为已签名。获批后的签名致谢措辞为 “Free code signing provided by SignPath.io, certificate by SignPath Foundation”。[Code signing policy / 代码签名政策](https://github.com/CyanQX/VoxMate-Windows/blob/main/docs/code-signing-policy.md) 说明维护者角色与签名范围。
 
 源码与构建说明见仓库 `README.md`。安装器未在构建电脑上运行或安装；本次发布提供未经代码签名的初始版本，供用户自行核对来源及 SHA-256。
