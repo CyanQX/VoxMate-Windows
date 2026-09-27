@@ -10,7 +10,9 @@
 
 ## 获批后的配置
 
-1. 在 SignPath 创建 VoxMate 项目，添加 GitHub.com Trusted Build System，并按官方说明安装 SignPath GitHub App、授予此仓库访问权限。
+配置前，维护者应按 [GitHub 官方步骤](https://docs.github.com/en/authentication/securing-your-account-with-two-factor-authentication-2fa/configuring-two-factor-authentication)为 GitHub 启用双重验证，并为 SignPath 账号启用多因素认证。
+
+1. 按 SignPath 的获批通知激活组织与 VoxMate 项目，添加 GitHub.com Trusted Build System。若签名政策需要 GitHub 审计日志或源码策略验证，再按 SignPath 的要求安装 SignPath GitHub App，仅授予此仓库所需权限。
 2. 在 SignPath 项目中建立 Artifact Configuration，将 `signing/signpath-artifact-configuration.xml` 的内容粘贴进去，保存其 slug。为项目配置 SignPath Foundation 证书和要求每次签名人工批准的 Signing Policy。配置由 SignPath 提供的组织与项目值，不要凭空填写。
 3. GitHub 仓库 Settings → Secrets and variables → Actions：设置 secret `SIGNPATH_API_TOKEN`；设置 variables `SIGNPATH_ORGANIZATION_ID`、`SIGNPATH_PROJECT_SLUG`、`SIGNPATH_SIGNING_POLICY_SLUG`、`SIGNPATH_ARTIFACT_CONFIGURATION_SLUG`。令牌只授予提交签名请求所需权限，不写入仓库。
 4. GitHub Actions → **Build Windows installer** → Run workflow，选 `main`，把 `sign_with_signpath` 设为 `true`。SignPath 的审批人核对源代码、构建记录与版本后，手动批准该次请求。GitHub Action 随后核验 Authenticode 状态、发布者和版本，再生成签名后文件的 SHA-256。
